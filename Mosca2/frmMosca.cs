@@ -1,4 +1,6 @@
-﻿namespace Mosca2;
+﻿using NAudio.Wave;
+
+namespace Mosca2;
 
 public partial class frmMosca : Form
 {
@@ -10,7 +12,10 @@ public partial class frmMosca : Form
     private int _anguloAtual = 0;
     private Point _destinoVoar;
     private bool _emVoo = false;
-    private bool _SeguirMouse = false;
+    private bool _seguirMouse = false;
+    private bool _comSom = false;
+    private IWavePlayer? _waveOut;
+    private WaveStream? _mp3Reader;
 
     public frmMosca()
     {
@@ -18,7 +23,7 @@ public partial class frmMosca : Form
 
         this.BackColor = Color.DarkGray;
         this.TransparencyKey = this.BackColor;
-        this.ShowInTaskbar = true;
+        this.ShowInTaskbar = false;
         this.TopMost = true;
 
         _timerMoverPernas = new System.Windows.Forms.Timer();
@@ -35,6 +40,52 @@ public partial class frmMosca : Form
         _timerVoar.Tick += async (s, e) => await TimerVoar_Tick(s, e);
         ProximoIntervaloVoarAsync().GetAwaiter().GetResult();
         _timerVoar.Start();
+
+        if (picMosca != null)
+            picMosca.MouseEnter += PicMosca_MouseEnter;
+
+        if (_comSom)
+        {
+            var mp3Stream = new MemoryStream();
+            Properties.Resources.Som_de_Mosca.CopyTo(mp3Stream);
+            mp3Stream.Position = 0;
+            _mp3Reader = new Mp3FileReader(mp3Stream);
+            _waveOut = new WaveOutEvent();
+            _waveOut.Init(_mp3Reader);
+        }
+
+        // Sorteia posição em uma das telas, evitando bordas (20px)
+        var screens = Screen.AllScreens;
+        var screen = screens[_random.Next(screens.Length)];
+        int margem = 20;
+        int maxX = screen.WorkingArea.Right - this.Width - margem;
+        int maxY = screen.WorkingArea.Bottom - this.Height - margem;
+        int minX = screen.WorkingArea.Left + margem;
+        int minY = screen.WorkingArea.Top + margem;
+        int x = _random.Next(minX, Math.Max(minX + 1, maxX));
+        int y = _random.Next(minY, Math.Max(minY + 1, maxY));
+        this.StartPosition = FormStartPosition.Manual;
+        this.Location = new Point(x, y);
+    }
+
+    private async void PicMosca_MouseEnter(object? sender, EventArgs e)
+    {
+        if (_seguirMouse) return;
+        if (_emVoo) return;
+        // Foge imediatamente para uma nova posição aleatória
+        var screens = Screen.AllScreens;
+        var screen = screens[_random.Next(screens.Length)];
+        int maxX = screen.WorkingArea.Right - this.Width;
+        int maxY = screen.WorkingArea.Bottom - this.Height;
+        int minX = screen.WorkingArea.Left;
+        int minY = screen.WorkingArea.Top;
+        int x = _random.Next(minX, maxX > minX ? maxX : minX + 1);
+        int y = _random.Next(minY, maxY > minY ? maxY : minY + 1);
+        _destinoVoar = new Point(x, y);
+        _emVoo = true;
+        _timerRotacao.Enabled = false;
+        await Voar();
+        _timerRotacao.Enabled = true;
     }
 
     private async Task TimerMoverPernas_Tick(object? sender, EventArgs e)
@@ -49,29 +100,74 @@ public partial class frmMosca : Form
         await ProximoIntervaloRotacaoAsync();
     }
 
+    private bool TemComida()
+    {
+        return Application.OpenForms.OfType<frmComida>().Count() > 0;
+    }
+
+    private List<frmComida> ListaComidas()
+    {
+        return Application.OpenForms.OfType<frmComida>().ToList();
+    }
+
     private async Task TimerVoar_Tick(object? sender, EventArgs e)
     {
         if (_emVoo)
             return;
-        // Sorteia uma tela e uma posição visível
-        var screens = Screen.AllScreens;
-        var screen = screens[_random.Next(screens.Length)];
-        int maxX = screen.WorkingArea.Right - this.Width;
-        int maxY = screen.WorkingArea.Bottom - this.Height;
-        int minX = screen.WorkingArea.Left;
-        int minY = screen.WorkingArea.Top;
-        int x = _random.Next(minX, maxX > minX ? maxX : minX + 1);
-        int y = _random.Next(minY, maxY > minY ? maxY : minY + 1);
-        _destinoVoar = new Point(x, y);
+        Point destino;
+        if (_seguirMouse && _random.NextDouble() < 0.95)
+        {
+            var mousePos = Cursor.Position;
+            // Centro da mosca exatamente na ponta do mouse
+            destino = new Point(mousePos.X - (this.Width / 2) + 50, mousePos.Y - (this.Height / 2) + 10);
+        }
+        else if (!_seguirMouse && TemComida() && _random.NextDouble() < 0.95)
+        {
+            var comidas = ListaComidas();
+            // Sorteia um dos frmComida abertos
+            var comida = comidas[_random.Next(comidas.Count)];
+            // Sorteia variações de -5 a +5 pixels
+            var offsetX = _random.Next(-9, 10);
+            var offsetY = _random.Next(-9, 10);
+            // Define o destino para o centro do frmComida sorteado, com variação
+            var comidaCentro = new Point(
+                comida.Left + comida.Width / 2 - this.Width / 2 + 15 + offsetX,
+                comida.Top + comida.Height / 2 - this.Height / 2 + 5 + offsetY
+            );
+
+            destino = comidaCentro;
+        }
+        else
+        {
+            var screens = Screen.AllScreens;
+            var screen = screens[_random.Next(screens.Length)];
+            int maxX = screen.WorkingArea.Right - this.Width;
+            int maxY = screen.WorkingArea.Bottom - this.Height;
+            int minX = screen.WorkingArea.Left;
+            int minY = screen.WorkingArea.Top;
+            int x = _random.Next(minX, maxX > minX ? maxX : minX + 1);
+            int y = _random.Next(minY, maxY > minY ? maxY : minY + 1);
+            destino = new Point(x, y);
+        }
+        _destinoVoar = destino;
         _emVoo = true;
-        _timerRotacao.Enabled = false; // Desativa rotação
+        _timerRotacao.Enabled = false;
         await Voar();
-        _timerRotacao.Enabled = true; // Reativa rotação
+        _timerRotacao.Enabled = true;
     }
 
     private async Task Voar()
     {
-        const int velocidade = 150;
+        if (_comSom && _waveOut != null && _mp3Reader != null)
+        {
+            _mp3Reader.Position = 0;
+            float[] volumes = { 1.0f, 0.8f, 0.5f, 0.3f, 0.1f };
+            _waveOut.Volume = volumes[_random.Next(volumes.Length)];
+            _waveOut.Play();
+            await Task.Delay(100);
+        }
+        int[] velocidades = { 100, 130, 150 };
+        int velocidade = velocidades[_random.Next(velocidades.Length)];
         while (true)
         {
             int dx = _destinoVoar.X - this.Left;
@@ -101,6 +197,8 @@ public partial class frmMosca : Form
             this.Top = ny;
             await Task.Delay(8);
         }
+        if (_waveOut != null)
+            _waveOut.Stop();
         _emVoo = false;
         await ProximoIntervaloVoarAsync();
     }

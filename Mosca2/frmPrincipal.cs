@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -17,4 +19,9 @@ public partial class frmPrincipal : Form
         }
     }
 
+    public async void button2_Click(object sender, EventArgs e)
+    {
+        frmComida comida = new frmComida();
+        await comida.Mostrar();
+    }
 }

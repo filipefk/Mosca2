@@ -63,6 +63,26 @@ namespace Mosca2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Lixo {
+            get {
+                object obj = ResourceManager.GetObject("Lixo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Merda {
+            get {
+                object obj = ResourceManager.GetObject("Merda", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Mosca1 {
             get {
                 object obj = ResourceManager.GetObject("Mosca1", resourceCulture);
@@ -107,6 +127,15 @@ namespace Mosca2.Properties {
             get {
                 object obj = ResourceManager.GetObject("Mosca5", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream Som_de_Mosca {
+            get {
+                return ResourceManager.GetStream("Som_de_Mosca", resourceCulture);
             }
         }
     }
