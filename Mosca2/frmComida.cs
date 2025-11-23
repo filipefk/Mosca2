@@ -42,7 +42,7 @@ public partial class frmComida : Form
 
         // Sorteia tempo de exibição
         int tempoMs = _random.Next(10, 31) * 1000;
-        
+
         _timer.Interval = tempoMs;
         _timer.Tick += (s, e) => { _timer.Stop(); this.Close(); };
         _timer.Start();

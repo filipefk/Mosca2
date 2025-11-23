@@ -31,6 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPrincipal));
             button1 = new Button();
             button2 = new Button();
+            button3 = new Button();
             SuspendLayout();
             // 
             // button1
@@ -53,11 +54,22 @@
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // button3
+            // 
+            button3.Location = new Point(199, 40);
+            button3.Name = "button3";
+            button3.Size = new Size(89, 60);
+            button3.TabIndex = 2;
+            button3.Text = "button3";
+            button3.UseVisualStyleBackColor = true;
+            button3.Click += button3_Click;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(314, 212);
+            Controls.Add(button3);
             Controls.Add(button2);
             Controls.Add(button1);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -70,5 +82,6 @@
 
         private Button button1;
         private Button button2;
+        private Button button3;
     }
 }

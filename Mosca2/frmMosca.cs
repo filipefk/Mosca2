@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using System.ComponentModel;
 
 namespace Mosca2;
 
@@ -12,8 +13,6 @@ public partial class frmMosca : Form
     private int _anguloAtual = 0;
     private Point _destinoVoar;
     private bool _emVoo = false;
-    private bool _seguirMouse = false;
-    private bool _comSom = false;
     private IWavePlayer? _waveOut;
     private WaveStream? _mp3Reader;
 
@@ -21,7 +20,7 @@ public partial class frmMosca : Form
     {
         InitializeComponent();
 
-        this.BackColor = Color.DarkGray;
+        this.BackColor = Color.FromArgb(128, 128, 128);
         this.TransparencyKey = this.BackColor;
         this.ShowInTaskbar = false;
         this.TopMost = true;
@@ -42,9 +41,13 @@ public partial class frmMosca : Form
         _timerVoar.Start();
 
         if (picMosca != null)
+        {
             picMosca.MouseEnter += PicMosca_MouseEnter;
+            picMosca.MouseWheel += PicMosca_MouseWheel;
+            picMosca.MouseClick += PicMosca_MouseClick;
+        }
 
-        if (_comSom)
+        if (ComSom)
         {
             var mp3Stream = new MemoryStream();
             Properties.Resources.Som_de_Mosca.CopyTo(mp3Stream);
@@ -54,38 +57,68 @@ public partial class frmMosca : Form
             _waveOut.Init(_mp3Reader);
         }
 
-        // Sorteia posição em uma das telas, evitando bordas (20px)
+        this.StartPosition = FormStartPosition.Manual;
+        this.Location = DestinoVoarAleatorio();
+    }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool SeguirMouse { get; set; } = false;
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool ComSom { get; set; } = false;
+
+    private async void PicMosca_MouseEnter(object? sender, EventArgs e)
+    {
+        if (SeguirMouse) return;
+        if (_emVoo) return;
+        await Fugir();
+    }
+
+    private async void PicMosca_MouseClick(object? sender, EventArgs e)
+    {
+        if (_emVoo) return;
+        await Fugir();
+    }
+
+    public async Task Fugir()
+    {
+        await VoarPara(DestinoVoarAleatorio());
+    }
+
+    public async Task VoarPara(Point destino, int velocidade = 0, bool levarMouse = false)
+    {
+        _destinoVoar = destino;
+        await VoarPara(velocidade, levarMouse);
+    }
+
+    public async Task VoarPara(int velocidade = 0, bool levarMouse = false)
+    {
+        _emVoo = true;
+        _timerRotacao.Enabled = false;
+        await Voar(velocidade, levarMouse);
+        _timerRotacao.Enabled = true;
+    }
+
+    public async Task RoubarMouse()
+    {
+        var mousePos = Cursor.Position;
+        var destinoMouse = new Point(mousePos.X - (this.Width / 2) + 50, mousePos.Y - (this.Height / 2) + 10);
+        await VoarPara(destinoMouse, 150);
+        await VoarPara(DestinoVoarAleatorio(), 80, true);
+    }
+
+    private Point DestinoVoarAleatorio()
+    {
         var screens = Screen.AllScreens;
         var screen = screens[_random.Next(screens.Length)];
-        int margem = 20;
+        int margem = 10;
         int maxX = screen.WorkingArea.Right - this.Width - margem;
         int maxY = screen.WorkingArea.Bottom - this.Height - margem;
         int minX = screen.WorkingArea.Left + margem;
         int minY = screen.WorkingArea.Top + margem;
         int x = _random.Next(minX, Math.Max(minX + 1, maxX));
         int y = _random.Next(minY, Math.Max(minY + 1, maxY));
-        this.StartPosition = FormStartPosition.Manual;
-        this.Location = new Point(x, y);
-    }
-
-    private async void PicMosca_MouseEnter(object? sender, EventArgs e)
-    {
-        if (_seguirMouse) return;
-        if (_emVoo) return;
-        // Foge imediatamente para uma nova posição aleatória
-        var screens = Screen.AllScreens;
-        var screen = screens[_random.Next(screens.Length)];
-        int maxX = screen.WorkingArea.Right - this.Width;
-        int maxY = screen.WorkingArea.Bottom - this.Height;
-        int minX = screen.WorkingArea.Left;
-        int minY = screen.WorkingArea.Top;
-        int x = _random.Next(minX, maxX > minX ? maxX : minX + 1);
-        int y = _random.Next(minY, maxY > minY ? maxY : minY + 1);
-        _destinoVoar = new Point(x, y);
-        _emVoo = true;
-        _timerRotacao.Enabled = false;
-        await Voar();
-        _timerRotacao.Enabled = true;
+        return new Point(x, y);
     }
 
     private async Task TimerMoverPernas_Tick(object? sender, EventArgs e)
@@ -115,13 +148,13 @@ public partial class frmMosca : Form
         if (_emVoo)
             return;
         Point destino;
-        if (_seguirMouse && _random.NextDouble() < 0.95)
+        if (SeguirMouse && _random.NextDouble() < 0.95)
         {
             var mousePos = Cursor.Position;
             // Centro da mosca exatamente na ponta do mouse
             destino = new Point(mousePos.X - (this.Width / 2) + 50, mousePos.Y - (this.Height / 2) + 10);
         }
-        else if (!_seguirMouse && TemComida() && _random.NextDouble() < 0.95)
+        else if (!SeguirMouse && TemComida() && _random.NextDouble() < 0.95)
         {
             var comidas = ListaComidas();
             // Sorteia um dos frmComida abertos
@@ -139,26 +172,14 @@ public partial class frmMosca : Form
         }
         else
         {
-            var screens = Screen.AllScreens;
-            var screen = screens[_random.Next(screens.Length)];
-            int maxX = screen.WorkingArea.Right - this.Width;
-            int maxY = screen.WorkingArea.Bottom - this.Height;
-            int minX = screen.WorkingArea.Left;
-            int minY = screen.WorkingArea.Top;
-            int x = _random.Next(minX, maxX > minX ? maxX : minX + 1);
-            int y = _random.Next(minY, maxY > minY ? maxY : minY + 1);
-            destino = new Point(x, y);
+            destino = DestinoVoarAleatorio();
         }
-        _destinoVoar = destino;
-        _emVoo = true;
-        _timerRotacao.Enabled = false;
-        await Voar();
-        _timerRotacao.Enabled = true;
+        await VoarPara(destino);
     }
 
-    private async Task Voar()
+    private async Task Voar(int velocidade = 0, bool levarMouse = false)
     {
-        if (_comSom && _waveOut != null && _mp3Reader != null)
+        if (ComSom && _waveOut != null && _mp3Reader != null)
         {
             _mp3Reader.Position = 0;
             float[] volumes = { 1.0f, 0.8f, 0.5f, 0.3f, 0.1f };
@@ -166,8 +187,8 @@ public partial class frmMosca : Form
             _waveOut.Play();
             await Task.Delay(100);
         }
-        int[] velocidades = { 100, 130, 150 };
-        int velocidade = velocidades[_random.Next(velocidades.Length)];
+        int[] velocidades = { 80, 100, 130, 150 };
+        velocidade = velocidade == 0 ? velocidades[_random.Next(velocidades.Length)] : velocidade;
         while (true)
         {
             int dx = _destinoVoar.X - this.Left;
@@ -177,6 +198,8 @@ public partial class frmMosca : Form
             {
                 this.Left = _destinoVoar.X;
                 this.Top = _destinoVoar.Y;
+                if (levarMouse)
+                    Cursor.Position = new Point(this.Left + this.Width / 2 - 50, this.Top + this.Height / 2 - 10);
                 break;
             }
             double ang = Math.Atan2(dy, dx);
@@ -195,6 +218,8 @@ public partial class frmMosca : Form
             int ny = this.Top + (int)(velocidade * Math.Sin(ang));
             this.Left = nx;
             this.Top = ny;
+            if (levarMouse)
+                Cursor.Position = new Point(this.Left + this.Width / 2 - 50, this.Top + this.Height / 2 - 10);
             await Task.Delay(8);
         }
         if (_waveOut != null)
@@ -273,5 +298,18 @@ public partial class frmMosca : Form
             g.DrawImage(img, new Point(0, 0));
         }
         return bmp;
+    }
+
+    private void PicMosca_MouseWheel(object? sender, MouseEventArgs e)
+    {
+        if (picMosca?.Image == null) return;
+        int quantosGraus = 40;
+        int delta = e.Delta > 0 ? quantosGraus * -1 : quantosGraus;
+        _anguloAtual = (_anguloAtual + delta + 360) % 360;
+        // Sempre rotaciona a imagem base
+        string imgName = _moscaImages[_random.Next(_moscaImages.Length)];
+        var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
+        if (img != null)
+            picMosca.Image = RotacionarImagem(img, _anguloAtual);
     }
 }
