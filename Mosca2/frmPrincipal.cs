@@ -14,6 +14,7 @@ public partial class frmPrincipal : Form
         for (int i = 0; i < forms.Length; i++)
         {
             forms[i] = new frmMosca();
+            //forms[i].ComSom = true;
             forms[i].Show();
         }
     }

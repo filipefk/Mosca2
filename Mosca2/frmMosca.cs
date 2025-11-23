@@ -1,5 +1,4 @@
 ﻿using NAudio.Wave;
-using System.ComponentModel;
 
 namespace Mosca2;
 
@@ -47,25 +46,20 @@ public partial class frmMosca : Form
             picMosca.MouseClick += PicMosca_MouseClick;
         }
 
-        if (ComSom)
-        {
-            var mp3Stream = new MemoryStream();
-            Properties.Resources.Som_de_Mosca.CopyTo(mp3Stream);
-            mp3Stream.Position = 0;
-            _mp3Reader = new Mp3FileReader(mp3Stream);
-            _waveOut = new WaveOutEvent();
-            _waveOut.Init(_mp3Reader);
-        }
+        var mp3Stream = new MemoryStream();
+        Properties.Resources.Som_de_Mosca.CopyTo(mp3Stream);
+        mp3Stream.Position = 0;
+        _mp3Reader = new Mp3FileReader(mp3Stream);
+        _waveOut = new WaveOutEvent();
+        _waveOut.Init(_mp3Reader);
 
         this.StartPosition = FormStartPosition.Manual;
         this.Location = DestinoVoarAleatorio();
     }
 
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool SeguirMouse { get; set; } = false;
+    public bool SeguirMouse = false;
 
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ComSom { get; set; } = false;
+    public bool ComSom = false;
 
     private async void PicMosca_MouseEnter(object? sender, EventArgs e)
     {
