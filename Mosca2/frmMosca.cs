@@ -315,5 +315,75 @@ public partial class frmMosca : Form
         this.Close();
     }
 
+    public async Task DancaLoca()
+    {
+        // 1 - Desativa todos os timers de movimento
+        _timerMoverPernas.Stop();
+        _timerRotacao.Stop();
+        _timerVoar.Stop();
 
+        // 2 - Posicionar com a cabeça apontando pra cima
+        _anguloAtual = 35;
+        picMosca.Image = RotacionarImagem(picMosca.Image!, _anguloAtual);
+
+        await Task.Delay(200);
+
+        await PatinhasBoomerang(10);
+
+        await Rodopio(5, true);
+
+        // 5 - Mover um tanto para a esquerda
+        this.Left -= 100;
+        await Task.Delay(150);
+
+        _anguloAtual = 215;
+        picMosca.Image = RotacionarImagem(picMosca.Image!, _anguloAtual);
+
+        await PatinhasBoomerang(10);
+
+        await Rodopio(5, false);
+
+        // 8 - Voltar tudo ao normal, reativar todos os timers
+        ProximoIntervaloMoverPernas();
+        ProximoIntervaloRotacao();
+        ProximoIntervaloVoar();
+        _timerMoverPernas.Start();
+        _timerRotacao.Start();
+        _timerVoar.Start();
+    }
+
+    public async Task Rodopio(int numeroVoltas, bool sentidoHorario)
+    {
+        var grausIncremento = 20;
+        int incremento = sentidoHorario ? grausIncremento : -grausIncremento;
+        int passosPorVolta = 360 / grausIncremento;
+        int totalPassos = numeroVoltas * passosPorVolta;
+        int delayMs = 800 / passosPorVolta; // para ~1 volta por segundo
+        for (int i = 0; i < totalPassos; i++)
+        {
+            _anguloAtual = (_anguloAtual + incremento + 360) % 360;
+            if (picMosca != null && picMosca.Image != null)
+                picMosca.Image = RotacionarImagem(picMosca.Image, _anguloAtual);
+            await Task.Delay(delayMs);
+        }
+    }
+
+    public async Task PatinhasBoomerang(int quantasVezes)
+    {
+        int idx1 = _random.Next(_moscaImages.Length);
+        int idx2;
+        do {
+            idx2 = _random.Next(_moscaImages.Length);
+        } while (idx2 == idx1);
+        for (int i = 0; i < quantasVezes; i++)
+        {
+            foreach (var idx in new[] { idx1, idx2 })
+            {
+                var img = (Image?)Properties.Resources.ResourceManager.GetObject(_moscaImages[idx]);
+                if (img != null && picMosca != null)
+                    picMosca.Image = RotacionarImagem(img, _anguloAtual);
+                await Task.Delay(150);
+            }
+        }
+    }
 }

@@ -21,6 +21,7 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Fugir do mouse", null, (s, e) => FugirDoMouse());
         trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => IniciarComandosAleatorios());
         trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => PararComandosAleatorios());
+        trayMenu.Items.Add("Dança loca", null, (s, e) => DancaLoca());
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
         // Inicializa o NotifyIcon com o menu de contexto
@@ -104,6 +105,12 @@ public partial class frmPrincipal : Form
 
     private void IniciarComandosAleatorios() { }
     private void PararComandosAleatorios() { }
+
+    private async void DancaLoca()
+    {
+        var tasks = moscas.Select(mosca => mosca.DancaLoca());
+        await Task.WhenAll(tasks);
+    }
 
     private void MatarMoscas()
     {
