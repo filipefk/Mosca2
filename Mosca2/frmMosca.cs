@@ -19,7 +19,7 @@ public partial class frmMosca : Form
     {
         InitializeComponent();
 
-        this.BackColor = Color.FromArgb(128, 128, 128);
+        this.BackColor = Color.FromArgb(50, 50, 50);
         this.TransparencyKey = this.BackColor;
         this.ShowInTaskbar = false;
         this.TopMost = true;

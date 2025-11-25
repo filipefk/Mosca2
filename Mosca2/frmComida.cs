@@ -28,7 +28,7 @@ public partial class frmComida : Form
 
     public async Task Mostrar()
     {
-        this.BackColor = Color.DarkGray;
+        this.BackColor = Color.FromArgb(50, 50, 50);
         this.TransparencyKey = this.BackColor;
         this.ShowInTaskbar = false;
         this.Show();

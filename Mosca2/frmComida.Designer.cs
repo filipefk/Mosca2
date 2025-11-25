@@ -34,7 +34,7 @@
             // 
             // picComida
             // 
-            picComida.Image = Properties.Resources.Merda;
+            picComida.Image = Properties.Resources.Lixo;
             picComida.Location = new Point(0, -1);
             picComida.Name = "picComida";
             picComida.Size = new Size(72, 65);
