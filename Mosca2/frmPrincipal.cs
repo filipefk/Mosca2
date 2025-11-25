@@ -26,11 +26,21 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
         // Inicializa o NotifyIcon com o menu de contexto
-        notifyIcon = new NotifyIcon();
+        notifyIcon = new();
         notifyIcon.Icon = this.Icon;
         notifyIcon.Text = "Bzzzzzz";
         notifyIcon.ContextMenuStrip = trayMenu;
         notifyIcon.Visible = true;
+        notifyIcon.MouseUp += NotifyIcon_MouseUp;
+    }
+
+    private void NotifyIcon_MouseUp(object? sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right && trayMenu != null)
+        {
+            // Exibe o menu com o canto inferior direito alinhado à ponta do cursor
+            trayMenu.Show(Cursor.Position.X - trayMenu.Width, Cursor.Position.Y - trayMenu.Height);
+        }
     }
 
     private async void DarComida() 
