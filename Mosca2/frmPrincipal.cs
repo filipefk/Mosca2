@@ -1,5 +1,3 @@
-using System.Windows.Forms;
-
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -43,19 +41,19 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private async void DarComida() 
+    private async void DarComida()
     {
         var comida = new frmComida();
         await comida.Mostrar();
     }
 
-    private void MaisMosca() 
+    private void MaisMosca()
     {
         AdicionarNovaMosca();
     }
 
-    private void MenosMosca() 
-    { 
+    private void MenosMosca()
+    {
         if (moscas.Count > 0)
         {
             var mosca = moscas[0];
@@ -64,7 +62,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private async void RoubarOMouse() 
+    private async void RoubarOMouse()
     {
         if (moscas.Count > 0)
         {
@@ -72,15 +70,15 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void ComSom() 
-    { 
+    private void ComSom()
+    {
         foreach (var mosca in moscas)
         {
             mosca.ComSom = true;
         }
     }
 
-    private void SemSom() 
+    private void SemSom()
     {
         foreach (var mosca in moscas)
         {
@@ -88,7 +86,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void SeguirOMouse() 
+    private void SeguirOMouse()
     {
         foreach (var mosca in moscas)
         {
@@ -96,7 +94,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void FugirDoMouse() 
+    private void FugirDoMouse()
     {
         foreach (var mosca in moscas)
         {
@@ -106,9 +104,9 @@ public partial class frmPrincipal : Form
 
     private void IniciarComandosAleatorios() { }
     private void PararComandosAleatorios() { }
-    
-    private void MatarMoscas() 
-    { 
+
+    private void MatarMoscas()
+    {
         Application.Exit();
     }
 

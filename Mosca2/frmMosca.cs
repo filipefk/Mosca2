@@ -7,7 +7,7 @@ public partial class frmMosca : Form
     private readonly System.Windows.Forms.Timer _timerMoverPernas;
     private readonly System.Windows.Forms.Timer _timerRotacao;
     private readonly System.Windows.Forms.Timer _timerVoar;
-    private readonly Random _random = new();
+    private static readonly Random _random = new();
     private readonly string[] _moscaImages = { "Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5" };
     private int _anguloAtual = 0;
     private Point _destinoVoar;
@@ -216,22 +216,19 @@ public partial class frmMosca : Form
 
     private void ProximoIntervaloMoverPernas()
     {
-        int[] intervals = { 200, 300, 500, 800 };
-        int nextInterval = intervals[_random.Next(intervals.Length)];
+        int nextInterval = _random.Next(500, 1500);
         _timerMoverPernas.Interval = nextInterval;
     }
 
     private void ProximoIntervaloRotacao()
     {
-        int[] intervals = { 1000, 2000, 3000 };
-        int nextInterval = intervals[_random.Next(intervals.Length)];
+        int nextInterval = _random.Next(2000, 5000);
         _timerRotacao.Interval = nextInterval;
     }
 
     private void ProximoIntervaloVoar()
     {
-        int[] intervals = { 2000, 3000, 4000 };
-        int nextInterval = intervals[_random.Next(intervals.Length)];
+        int nextInterval = _random.Next(500, 10001);
         _timerVoar.Interval = nextInterval;
         _emVoo = false;
     }
@@ -317,4 +314,6 @@ public partial class frmMosca : Form
         // Fecha o formulário
         this.Close();
     }
+
+
 }
