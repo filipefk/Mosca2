@@ -91,8 +91,9 @@ public partial class frmMosca : Form
         _timerRotacao.Enabled = true;
     }
 
-    public async Task RoubarMouse()
+    public async Task RoubarMouse(int esperarMilissegundos = 0)
     {
+        await Task.Delay(esperarMilissegundos);
         var mousePos = Cursor.Position;
         var destinoMouse = new Point(mousePos.X - (this.Width / 2) + 50, mousePos.Y - (this.Height / 2) + 10);
         await VoarPara(destinoMouse, 150);
@@ -288,5 +289,32 @@ public partial class frmMosca : Form
         var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
         if (img != null)
             picMosca.Image = RotacionarImagem(img, _anguloAtual);
+    }
+
+    public void Morrer()
+    {
+        // Para os timers
+        _timerMoverPernas.Stop();
+        _timerMoverPernas.Dispose();
+        _timerRotacao.Stop();
+        _timerRotacao.Dispose();
+        _timerVoar.Stop();
+        _timerVoar.Dispose();
+
+        // Para o áudio
+        if (_waveOut != null)
+        {
+            _waveOut.Stop();
+            _waveOut.Dispose();
+            _waveOut = null;
+        }
+        if (_mp3Reader != null)
+        {
+            _mp3Reader.Dispose();
+            _mp3Reader = null;
+        }
+
+        // Fecha o formulário
+        this.Close();
     }
 }
