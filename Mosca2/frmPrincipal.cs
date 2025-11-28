@@ -5,6 +5,7 @@ public partial class frmPrincipal : Form
     private List<frmMosca> moscas = [];
     private NotifyIcon? notifyIcon;
     private ContextMenuStrip? trayMenu;
+    private int quantasMoscas = 1;
 
     public frmPrincipal()
     {
@@ -22,6 +23,7 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => IniciarComandosAleatorios());
         trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => PararComandosAleatorios());
         trayMenu.Items.Add("Dança loca", null, (s, e) => DancaLoca());
+        trayMenu.Items.Add("Fila indiana", null, (s, e) => FilaIndiana());
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
         // Inicializa o NotifyIcon com o menu de contexto
@@ -37,7 +39,6 @@ public partial class frmPrincipal : Form
     {
         if (e.Button == MouseButtons.Right && trayMenu != null)
         {
-            // Exibe o menu com o canto inferior direito alinhado à ponta do cursor
             trayMenu.Show(Cursor.Position.X - trayMenu.Width, Cursor.Position.Y - trayMenu.Height);
         }
     }
@@ -112,6 +113,17 @@ public partial class frmPrincipal : Form
         await Task.WhenAll(tasks);
     }
 
+    private async void FilaIndiana()
+    {
+        //var tasks = moscas.Select(mosca => mosca.FilaIndiana());
+        foreach (var mosca in moscas)
+        {
+            mosca.AtivarTimers(false);
+        }
+        //var tasks = moscas.Select(mosca => mosca.AtivarTimers(false));
+        //await Task.WhenAll(tasks);
+    }
+
     private void MatarMoscas()
     {
         Application.Exit();
@@ -134,6 +146,7 @@ public partial class frmPrincipal : Form
     public void AdicionarNovaMosca()
     {
         var mosca = new frmMosca();
+        mosca.Indice = moscas.Count;
         mosca.Show();
         moscas.Add(mosca);
     }
@@ -141,7 +154,7 @@ public partial class frmPrincipal : Form
     private void frmPrincipal_Load(object sender, EventArgs e)
     {
         FormTransparente();
-        MostrarMoscas(1);
+        MostrarMoscas(quantasMoscas);
         this.Hide();
     }
 

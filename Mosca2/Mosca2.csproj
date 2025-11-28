@@ -9,6 +9,7 @@
     <ApplicationIcon>Mosca.ico</ApplicationIcon>
     <AssemblyTitle>Mosca</AssemblyTitle>
     <AssemblyName>Mosca</AssemblyName>
+    <NoWarn>$(NoWarn);WFO1000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

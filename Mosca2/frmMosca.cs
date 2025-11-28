@@ -15,6 +15,14 @@ public partial class frmMosca : Form
     private IWavePlayer? _waveOut;
     private WaveStream? _mp3Reader;
 
+    public enum Direcao
+    {
+        Cima,
+        Baixo,
+        Esquerda,
+        Direita
+    }
+
     public frmMosca()
     {
         InitializeComponent();
@@ -54,11 +62,12 @@ public partial class frmMosca : Form
         _waveOut.Init(_mp3Reader);
 
         this.StartPosition = FormStartPosition.Manual;
-        this.Location = DestinoVoarAleatorio();
+        this.Location = ForaDeTodasTelasAleatorio();
     }
 
-    public bool SeguirMouse = false;
-    public bool ComSom = false;
+    public bool SeguirMouse { get; set; } = false;
+    public bool ComSom { get; set; } = false;
+    public int Indice { get; set; } = -1;
 
     private async void PicMosca_MouseEnter(object? sender, EventArgs e)
     {
@@ -86,9 +95,12 @@ public partial class frmMosca : Form
     public async Task VoarPara(int velocidade = 0, bool levarMouse = false)
     {
         _emVoo = true;
-        _timerRotacao.Enabled = false;
+        var rotacaoAtiva = _timerRotacao.Enabled;
+        if (rotacaoAtiva) 
+            _timerRotacao.Enabled = false;
         await Voar(velocidade, levarMouse);
-        _timerRotacao.Enabled = true;
+        if (rotacaoAtiva)
+            _timerRotacao.Enabled = true;
     }
 
     public async Task RoubarMouse(int esperarMilissegundos = 0)
@@ -112,6 +124,55 @@ public partial class frmMosca : Form
         int x = _random.Next(minX, Math.Max(minX + 1, maxX));
         int y = _random.Next(minY, Math.Max(minY + 1, maxY));
         return new Point(x, y);
+    }
+
+    private Point ForaDeTodasTelasAleatorio()
+    {
+        var screens = Screen.AllScreens;
+        int margem = 100; // quanto "fora" da tela
+        int tentativas = 0;
+        while (tentativas < 20)
+        {
+            var screen = screens[_random.Next(screens.Length)];
+            int borda = _random.Next(4); // 0: cima, 1: baixo, 2: esquerda, 3: direita
+            int x = 0, y = 0;
+            switch (borda)
+            {
+                case 0: // cima
+                    x = _random.Next(screen.WorkingArea.Left, screen.WorkingArea.Right - this.Width);
+                    y = screen.WorkingArea.Top - this.Height - margem;
+                    break;
+                case 1: // baixo
+                    x = _random.Next(screen.WorkingArea.Left, screen.WorkingArea.Right - this.Width);
+                    y = screen.WorkingArea.Bottom + margem;
+                    break;
+                case 2: // esquerda
+                    x = screen.WorkingArea.Left - this.Width - margem;
+                    y = _random.Next(screen.WorkingArea.Top, screen.WorkingArea.Bottom - this.Height);
+                    break;
+                case 3: // direita
+                    x = screen.WorkingArea.Right + margem;
+                    y = _random.Next(screen.WorkingArea.Top, screen.WorkingArea.Bottom - this.Height);
+                    break;
+            }
+            var pos = new Point(x, y);
+            var rect = new Rectangle(pos, this.Size);
+            bool fora = true;
+            foreach (var s in screens)
+            {
+                if (rect.IntersectsWith(s.WorkingArea))
+                {
+                    fora = false;
+                    break;
+                }
+            }
+            if (fora)
+                return pos;
+            tentativas++;
+        }
+        // fallback: retorna posição fora da primeira tela
+        var fallback = new Point(screens[0].WorkingArea.Left - this.Width - margem, screens[0].WorkingArea.Top);
+        return fallback;
     }
 
     private void TimerMoverPernas_Tick(object? sender, EventArgs e)
@@ -317,12 +378,8 @@ public partial class frmMosca : Form
 
     public async Task DancaLoca()
     {
-        // 1 - Desativa todos os timers de movimento
-        _timerMoverPernas.Stop();
-        _timerRotacao.Stop();
-        _timerVoar.Stop();
+        AtivarTimers(false);
 
-        // 2 - Posicionar com a cabeça apontando pra cima
         _anguloAtual = 35;
         picMosca.Image = RotacionarImagem(picMosca.Image!, _anguloAtual);
 
@@ -343,13 +400,7 @@ public partial class frmMosca : Form
 
         await Rodopio(5, false);
 
-        // 8 - Voltar tudo ao normal, reativar todos os timers
-        ProximoIntervaloMoverPernas();
-        ProximoIntervaloRotacao();
-        ProximoIntervaloVoar();
-        _timerMoverPernas.Start();
-        _timerRotacao.Start();
-        _timerVoar.Start();
+        AtivarTimers(true);
     }
 
     public async Task Rodopio(int numeroVoltas, bool sentidoHorario)
@@ -386,4 +437,86 @@ public partial class frmMosca : Form
             }
         }
     }
+
+    public async Task FilaIndiana()
+    {
+        AtivarTimers(false);
+
+        if (Indice < 0)
+            return;
+
+        var screen = Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
+        int centerX = screen.Left + (screen.Width - this.Width) / 2;
+        int centerY = screen.Top + (screen.Height - this.Height) / 2;
+        int spacing = 30;
+
+        int x;
+        if (Indice == 0)
+        {
+            x = centerX;
+        }
+        else if (Indice % 2 == 0)
+        {
+            // Par diferente de zero: esquerda
+            x = centerX - (spacing * Indice);
+        }
+        else
+        {
+            // Ímpar: direita
+            x = centerX + (spacing * Indice);
+        }
+
+        var destino = new Point(x, centerY);
+        await VoarPara(destino, 120);
+        await OlharPara(Direcao.Direita);
+        await Task.Delay(1000);
+        await OlharPara(Direcao.Baixo);
+        await Task.Delay(1000);
+        await OlharPara(Direcao.Esquerda);
+        await Task.Delay(1000);
+        await OlharPara(Direcao.Cima);
+
+        AtivarTimers(true);
+    }
+
+    public async Task OlharPara(Direcao onde)
+    {
+        switch (onde)
+        {
+            case Direcao.Cima:
+                _anguloAtual = 30;
+                break;
+            case Direcao.Direita:
+                _anguloAtual = 120;
+                break;
+            case Direcao.Baixo:
+                _anguloAtual = 210;
+                break;
+            case Direcao.Esquerda:
+                _anguloAtual = 300;
+                break;
+        }
+        if (picMosca != null && picMosca.Image != null)
+            picMosca.Image = RotacionarImagem(picMosca.Image, _anguloAtual);
+    }
+
+    public void AtivarTimers(bool ativar)
+    {
+        if (ativar)
+        {
+            ProximoIntervaloMoverPernas();
+            ProximoIntervaloRotacao();
+            ProximoIntervaloVoar();
+            _timerMoverPernas.Start();
+            _timerRotacao.Start();
+            _timerVoar.Start();
+        }
+        else
+        {
+            _timerMoverPernas.Stop();
+            _timerRotacao.Stop();
+            _timerVoar.Stop();
+        }
+    }
+
 }
