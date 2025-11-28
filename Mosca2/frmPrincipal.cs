@@ -64,6 +64,7 @@ public partial class frmPrincipal : Form
                 mosca.SeguirMouse = chkSeguirMouse.Checked;
                 mosca.ComSom = chkComSom.Checked;
             }
+            lblTotalDeMoscas.Text = $"Total de moscas: {moscas.Count}";
         }
     }
 
@@ -197,6 +198,18 @@ public partial class frmPrincipal : Form
 
     private void chkTimers_CheckedChanged(object sender, EventArgs e)
     {
+        AjustaPropriedades();
+    }
+
+    private void btMaisUmaMosca_Click(object sender, EventArgs e)
+    {
+        MaisMosca();
+        AjustaPropriedades();
+    }
+
+    private void btMenosUmaMosca_Click(object sender, EventArgs e)
+    {
+        MenosMosca();
         AjustaPropriedades();
     }
 }

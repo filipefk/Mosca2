@@ -40,6 +40,9 @@
             chkTimerVoar = new CheckBox();
             chkSeguirMouse = new CheckBox();
             chkComSom = new CheckBox();
+            btMaisUmaMosca = new Button();
+            btMenosUmaMosca = new Button();
+            lblTotalDeMoscas = new Label();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -103,11 +106,43 @@
             chkComSom.UseVisualStyleBackColor = true;
             chkComSom.CheckedChanged += chkTimers_CheckedChanged;
             // 
+            // btMaisUmaMosca
+            // 
+            btMaisUmaMosca.Location = new Point(144, 7);
+            btMaisUmaMosca.Name = "btMaisUmaMosca";
+            btMaisUmaMosca.Size = new Size(25, 26);
+            btMaisUmaMosca.TabIndex = 5;
+            btMaisUmaMosca.Text = "+";
+            btMaisUmaMosca.UseVisualStyleBackColor = true;
+            btMaisUmaMosca.Click += btMaisUmaMosca_Click;
+            // 
+            // btMenosUmaMosca
+            // 
+            btMenosUmaMosca.Location = new Point(175, 7);
+            btMenosUmaMosca.Name = "btMenosUmaMosca";
+            btMenosUmaMosca.Size = new Size(25, 26);
+            btMenosUmaMosca.TabIndex = 6;
+            btMenosUmaMosca.Text = "-";
+            btMenosUmaMosca.UseVisualStyleBackColor = true;
+            btMenosUmaMosca.Click += btMenosUmaMosca_Click;
+            // 
+            // lblTotalDeMoscas
+            // 
+            lblTotalDeMoscas.AutoSize = true;
+            lblTotalDeMoscas.Location = new Point(217, 13);
+            lblTotalDeMoscas.Name = "lblTotalDeMoscas";
+            lblTotalDeMoscas.Size = new Size(104, 15);
+            lblTotalDeMoscas.TabIndex = 7;
+            lblTotalDeMoscas.Text = "Total de moscas: 0";
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(413, 151);
+            ClientSize = new Size(386, 153);
+            Controls.Add(lblTotalDeMoscas);
+            Controls.Add(btMenosUmaMosca);
+            Controls.Add(btMaisUmaMosca);
             Controls.Add(chkComSom);
             Controls.Add(chkSeguirMouse);
             Controls.Add(chkTimerVoar);
@@ -129,5 +164,8 @@
         private CheckBox chkTimerVoar;
         private CheckBox chkSeguirMouse;
         private CheckBox chkComSom;
+        private Button btMaisUmaMosca;
+        private Button btMenosUmaMosca;
+        private Label lblTotalDeMoscas;
     }
 }
