@@ -5,7 +5,7 @@ public partial class frmPrincipal : Form
     private List<frmMosca> moscas = [];
     private NotifyIcon? notifyIcon;
     private ContextMenuStrip? trayMenu;
-    private int quantasMoscas = 1;
+    private int quantasMoscas = 10;
 
     public frmPrincipal()
     {
@@ -24,6 +24,7 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => PararComandosAleatorios());
         trayMenu.Items.Add("Dança loca", null, (s, e) => DancaLoca());
         trayMenu.Items.Add("Fila indiana", null, (s, e) => FilaIndiana());
+        trayMenu.Items.Add("Roda gigante", null, (s, e) => RodaGigante());
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
         // Inicializa o NotifyIcon com o menu de contexto
@@ -122,6 +123,11 @@ public partial class frmPrincipal : Form
         }
         //var tasks = moscas.Select(mosca => mosca.AtivarTimers(false));
         //await Task.WhenAll(tasks);
+    }
+    private async void RodaGigante()
+    {
+        var tasks = moscas.Select(mosca => mosca.RodaGigante());
+        await Task.WhenAll(tasks);
     }
 
     private void MatarMoscas()

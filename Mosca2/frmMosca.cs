@@ -69,6 +69,8 @@ public partial class frmMosca : Form
     public bool ComSom { get; set; } = false;
     public int Indice { get; set; } = -1;
 
+    public Point PosicaoAtual { get => new Point(this.Left, this.Top); }
+
     private async void PicMosca_MouseEnter(object? sender, EventArgs e)
     {
         if (SeguirMouse || _emVoo) return;
@@ -236,8 +238,7 @@ public partial class frmMosca : Form
             _waveOut.Play();
             await Task.Delay(100);
         }
-        int[] velocidades = { 80, 100, 130, 150 };
-        velocidade = velocidade == 0 ? velocidades[_random.Next(velocidades.Length)] : velocidade;
+        velocidade = velocidade == 0 ? _random.Next(80, 201) : velocidade;
         while (true)
         {
             int dx = _destinoVoar.X - this.Left;
@@ -479,6 +480,19 @@ public partial class frmMosca : Form
         AtivarTimers(true);
     }
 
+    public async Task RodaGigante()
+    {
+        AtivarTimers(false);
+        for (int i = 0; i < 4; i++)
+        {
+            await VoarPara(BordaMaisProxima(Direcao.Cima), 50);
+            await VoarPara(BordaMaisProxima(Direcao.Direita), 50);
+            await VoarPara(BordaMaisProxima(Direcao.Baixo), 50);
+            await VoarPara(BordaMaisProxima(Direcao.Esquerda), 50);
+        }
+        AtivarTimers(true);
+    }
+
     public async Task OlharPara(Direcao onde)
     {
         switch (onde)
@@ -517,6 +531,50 @@ public partial class frmMosca : Form
             _timerRotacao.Stop();
             _timerVoar.Stop();
         }
+    }
+
+    private Point BordaMaisProxima(Direcao? direcao = null)
+    {
+        // Descobre a tela onde o ponto está
+        Screen? screen = Screen.AllScreens.FirstOrDefault(s => s.WorkingArea.Contains(PosicaoAtual));
+        if (screen == null)
+        {
+            // Se não estiver em nenhuma tela, usa a principal
+            screen = Screen.PrimaryScreen;
+        }
+        var area = screen.WorkingArea;
+
+        if (direcao != null)
+        {
+            switch (direcao.Value)
+            {
+                case Direcao.Cima:
+                    return new Point(PosicaoAtual.X, area.Top);
+                case Direcao.Baixo:
+                    return new Point(PosicaoAtual.X, area.Bottom - 30);
+                case Direcao.Esquerda:
+                    return new Point(area.Left, PosicaoAtual.Y);
+                case Direcao.Direita:
+                    return new Point(area.Right - 30, PosicaoAtual.Y);
+            }
+        }
+
+        // Calcula as distâncias até cada borda
+        int distTop = Math.Abs(PosicaoAtual.Y - area.Top);
+        int distBottom = Math.Abs(PosicaoAtual.Y - area.Bottom);
+        int distLeft = Math.Abs(PosicaoAtual.X - area.Left);
+        int distRight = Math.Abs(PosicaoAtual.X - area.Right);
+
+        int minDist = Math.Min(Math.Min(distTop, distBottom), Math.Min(distLeft, distRight));
+
+        if (minDist == distTop)
+            return new Point(PosicaoAtual.X, area.Top);
+        if (minDist == distBottom)
+            return new Point(PosicaoAtual.X, area.Bottom);
+        if (minDist == distLeft)
+            return new Point(area.Left, PosicaoAtual.Y);
+        // minDist == distRight
+        return new Point(area.Right, PosicaoAtual.Y);
     }
 
 }
