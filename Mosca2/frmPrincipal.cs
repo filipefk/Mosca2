@@ -5,12 +5,12 @@ public partial class frmPrincipal : Form
     private List<frmMosca> moscas = [];
     private NotifyIcon? notifyIcon;
     private ContextMenuStrip? trayMenu;
-    private int quantasMoscas = 10;
+    private int quantasMoscas = 1;
+    private static readonly bool ModoControleRemoto = true;
 
     public frmPrincipal()
     {
         InitializeComponent();
-        // Inicializa o menu de contexto
         trayMenu = new ContextMenuStrip();
         trayMenu.Items.Add("Dar comida", null, (s, e) => DarComida());
         trayMenu.Items.Add("Mais mosca", null, (s, e) => MaisMosca());
@@ -27,13 +27,44 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Roda gigante", null, (s, e) => RodaGigante());
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
-        // Inicializa o NotifyIcon com o menu de contexto
         notifyIcon = new();
         notifyIcon.Icon = this.Icon;
         notifyIcon.Text = "Bzzzzzz";
         notifyIcon.ContextMenuStrip = trayMenu;
         notifyIcon.Visible = true;
         notifyIcon.MouseUp += NotifyIcon_MouseUp;
+    }
+
+    private void frmPrincipal_Load(object sender, EventArgs e)
+    {
+        if (ModoControleRemoto)
+        {
+            this.ShowInTaskbar = true;
+            MostrarMoscas(1);
+            AjustaPropriedades();
+        }
+        else
+        {
+            this.ShowInTaskbar = false;
+            FormTransparente();
+            MostrarMoscas(quantasMoscas);
+            this.Hide();
+        }
+    }
+
+    private void AjustaPropriedades()
+    {
+        if (ModoControleRemoto)
+        {
+            foreach (var mosca in moscas)
+            {
+                mosca.AtivarTimerMoverPernas(chkTimerMoverPernas.Checked);
+                mosca.AtivarTimerRotacao(chkTimerRotacao.Checked);
+                mosca.AtivarTimerVoar(chkTimerVoar.Checked);
+                mosca.SeguirMouse = chkSeguirMouse.Checked;
+                mosca.ComSom = chkComSom.Checked;
+            }
+        }
     }
 
     private void NotifyIcon_MouseUp(object? sender, MouseEventArgs e)
@@ -157,17 +188,15 @@ public partial class frmPrincipal : Form
         moscas.Add(mosca);
     }
 
-    private void frmPrincipal_Load(object sender, EventArgs e)
-    {
-        FormTransparente();
-        MostrarMoscas(quantasMoscas);
-        this.Hide();
-    }
-
     private void FormTransparente()
     {
         this.TransparencyKey = Color.White;
         this.BackColor = Color.White;
         this.FormBorderStyle = FormBorderStyle.None;
+    }
+
+    private void chkTimers_CheckedChanged(object sender, EventArgs e)
+    {
+        AjustaPropriedades();
     }
 }

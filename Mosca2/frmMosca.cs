@@ -516,20 +516,47 @@ public partial class frmMosca : Form
 
     public void AtivarTimers(bool ativar)
     {
+        AtivarTimerVoar(ativar);
+        AtivarTimerRotacao(ativar);
+        AtivarTimerMoverPernas(ativar);
+    }
+
+    public void AtivarTimerVoar(bool ativar)
+    {
         if (ativar)
         {
-            ProximoIntervaloMoverPernas();
-            ProximoIntervaloRotacao();
             ProximoIntervaloVoar();
-            _timerMoverPernas.Start();
-            _timerRotacao.Start();
             _timerVoar.Start();
         }
         else
         {
-            _timerMoverPernas.Stop();
-            _timerRotacao.Stop();
             _timerVoar.Stop();
+        }
+    }
+
+    public void AtivarTimerRotacao(bool ativar)
+    {
+        if (ativar)
+        {
+            ProximoIntervaloRotacao();
+            _timerRotacao.Start();
+        }
+        else
+        {
+            _timerRotacao.Stop();
+        }
+    }
+
+    public void AtivarTimerMoverPernas(bool ativar)
+    {
+        if (ativar)
+        {
+            ProximoIntervaloMoverPernas();
+            _timerMoverPernas.Start();
+        }
+        else
+        {
+            _timerMoverPernas.Stop();
         }
     }
 
