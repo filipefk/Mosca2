@@ -14,6 +14,8 @@ public partial class frmMosca : Form
     private bool _emVoo = false;
     private IWavePlayer? _waveOut;
     private WaveStream? _mp3Reader;
+    private bool _dragging = false;
+    private Point _dragOffset;
 
     public enum Direcao
     {
@@ -52,6 +54,9 @@ public partial class frmMosca : Form
             picMosca.MouseEnter += PicMosca_MouseEnter;
             picMosca.MouseWheel += PicMosca_MouseWheel;
             picMosca.MouseClick += PicMosca_MouseClick;
+            picMosca.MouseDown += PicMosca_MouseDown;
+            picMosca.MouseMove += PicMosca_MouseMove;
+            picMosca.MouseUp += PicMosca_MouseUp;
         }
 
         var mp3Stream = new MemoryStream();
@@ -67,6 +72,7 @@ public partial class frmMosca : Form
 
     public bool SeguirMouse { get; set; } = false;
     public bool ComSom { get; set; } = false;
+    public bool PermitirAgarrarSoltar { get; set; } = false;
     public int Indice { get; set; } = -1;
 
     public Point PosicaoAtual { get => new Point(this.Left, this.Top); }
@@ -80,7 +86,8 @@ public partial class frmMosca : Form
     private async void PicMosca_MouseClick(object? sender, EventArgs e)
     {
         if (_emVoo) return;
-        await Fugir();
+        if (!PermitirAgarrarSoltar)
+            await Fugir();
     }
 
     public async Task Fugir()
@@ -96,6 +103,7 @@ public partial class frmMosca : Form
 
     public async Task VoarPara(int velocidade = 0, bool levarMouse = false)
     {
+        if (_dragging) return;
         _emVoo = true;
         var rotacaoAtiva = _timerRotacao.Enabled;
         if (rotacaoAtiva) 
@@ -179,7 +187,7 @@ public partial class frmMosca : Form
 
     private void TimerMoverPernas_Tick(object? sender, EventArgs e)
     {
-        TrocarImagemMosca();
+        MoverPatinhas();
         ProximoIntervaloMoverPernas();
     }
 
@@ -254,14 +262,8 @@ public partial class frmMosca : Form
             }
             double ang = Math.Atan2(dy, dx);
             int anguloMosca = (int)(ang * 180 / Math.PI) + 135;
-            _anguloAtual = ((anguloMosca % 360) + 360) % 360;
-            if (picMosca?.Image != null)
-            {
-                string imgName = _moscaImages[_random.Next(_moscaImages.Length)];
-                var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
-                if (img != null)
-                    picMosca.Image = RotacionarImagem(img, _anguloAtual);
-            }
+            var novoAngulo = ((anguloMosca % 360) + 360) % 360;
+            AplicarAngulo(novoAngulo);
             int nx = this.Left + (int)(velocidade * Math.Cos(ang));
             int ny = this.Top + (int)(velocidade * Math.Sin(ang));
             this.Left = nx;
@@ -274,6 +276,15 @@ public partial class frmMosca : Form
             _waveOut.Stop();
         _emVoo = false;
         ProximoIntervaloVoar();
+    }
+
+    public void AplicarAngulo(int angulo)
+    {
+        if (picMosca?.Image != null)
+        {
+            _anguloAtual = angulo;
+            picMosca.Image = RotacionarImagem(_anguloAtual);
+        }
     }
 
     private void ProximoIntervaloMoverPernas()
@@ -295,14 +306,14 @@ public partial class frmMosca : Form
         _emVoo = false;
     }
 
-    private void TrocarImagemMosca()
+    private void MoverPatinhas()
     {
         string imgName = _moscaImages[_random.Next(_moscaImages.Length)];
         var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
         if (img != null && picMosca != null)
         {
             if (_anguloAtual != 0)
-                picMosca.Image = RotacionarImagem(img, _anguloAtual);
+                picMosca.Image = RotacionarImagem(_anguloAtual, img);
             else
                 picMosca.Image = img;
         }
@@ -315,17 +326,19 @@ public partial class frmMosca : Form
         int angle = angles[_random.Next(angles.Length)];
         bool esquerda = _random.Next(2) == 0;
         if (!esquerda) angle = 360 - angle;
-        _anguloAtual = (_anguloAtual + angle) % 360;
-        string imgName = _moscaImages[_random.Next(_moscaImages.Length)];
-        var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
-        if (picMosca.Image != null)
-            img = picMosca.Image;
-        if (img != null)
-            picMosca.Image = RotacionarImagem(img, _anguloAtual);
+        var novoAngulo = (_anguloAtual + angle) % 360;
+        AplicarAngulo(novoAngulo);
     }
 
-    private static Image RotacionarImagem(Image img, float angle)
+    private Image RotacionarImagem(float angle, Image? img = null)
     {
+        if (img == null)
+        {
+            string imgName = _moscaImages[0];
+            img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
+            if (img == null)
+                throw new ArgumentException($"Imagem {imgName} não está nos resources");
+        }
         Bitmap bmp = new Bitmap(img.Width, img.Height);
         bmp.SetResolution(img.HorizontalResolution, img.VerticalResolution);
         using (Graphics g = Graphics.FromImage(bmp))
@@ -343,11 +356,34 @@ public partial class frmMosca : Form
         if (picMosca?.Image == null) return;
         int quantosGraus = 40;
         int delta = e.Delta > 0 ? quantosGraus * -1 : quantosGraus;
-        _anguloAtual = (_anguloAtual + delta + 360) % 360;
-        string imgName = _moscaImages[_random.Next(_moscaImages.Length)];
-        var img = (Image?)Properties.Resources.ResourceManager.GetObject(imgName);
-        if (img != null)
-            picMosca.Image = RotacionarImagem(img, _anguloAtual);
+        var novoAngulo = (_anguloAtual + delta + 360) % 360;
+        AplicarAngulo(novoAngulo);
+    }
+
+    private void PicMosca_MouseDown(object? sender, MouseEventArgs e)
+    {
+        if (PermitirAgarrarSoltar && e.Button == MouseButtons.Left)
+        {
+            _dragging = true;
+            _dragOffset = new Point(e.X, e.Y);
+        }
+    }
+
+    private void PicMosca_MouseMove(object? sender, MouseEventArgs e)
+    {
+        if (PermitirAgarrarSoltar && _dragging)
+        {
+            var mousePos = MousePosition;
+            this.Location = new Point(mousePos.X - _dragOffset.X, mousePos.Y - _dragOffset.Y);
+        }
+    }
+
+    private void PicMosca_MouseUp(object? sender, MouseEventArgs e)
+    {
+        if (PermitirAgarrarSoltar && e.Button == MouseButtons.Left)
+        {
+            _dragging = false;
+        }
     }
 
     public void Morrer()
@@ -381,9 +417,7 @@ public partial class frmMosca : Form
     {
         AtivarTimers(false);
 
-        _anguloAtual = 35;
-        picMosca.Image = RotacionarImagem(picMosca.Image!, _anguloAtual);
-
+        AplicarAngulo(35);
         await Task.Delay(200);
 
         await PatinhasBoomerang(10);
@@ -394,8 +428,7 @@ public partial class frmMosca : Form
         this.Left -= 100;
         await Task.Delay(150);
 
-        _anguloAtual = 215;
-        picMosca.Image = RotacionarImagem(picMosca.Image!, _anguloAtual);
+        AplicarAngulo(215);
 
         await PatinhasBoomerang(10);
 
@@ -413,9 +446,8 @@ public partial class frmMosca : Form
         int delayMs = 800 / passosPorVolta; // para ~1 volta por segundo
         for (int i = 0; i < totalPassos; i++)
         {
-            _anguloAtual = (_anguloAtual + incremento + 360) % 360;
-            if (picMosca != null && picMosca.Image != null)
-                picMosca.Image = RotacionarImagem(picMosca.Image, _anguloAtual);
+            var novoAngulo = (_anguloAtual + incremento + 360) % 360;
+            AplicarAngulo(novoAngulo);
             await Task.Delay(delayMs);
         }
     }
@@ -433,7 +465,7 @@ public partial class frmMosca : Form
             {
                 var img = (Image?)Properties.Resources.ResourceManager.GetObject(_moscaImages[idx]);
                 if (img != null && picMosca != null)
-                    picMosca.Image = RotacionarImagem(img, _anguloAtual);
+                    picMosca.Image = RotacionarImagem(_anguloAtual, img);
                 await Task.Delay(150);
             }
         }
@@ -498,20 +530,18 @@ public partial class frmMosca : Form
         switch (onde)
         {
             case Direcao.Cima:
-                _anguloAtual = 30;
+                AplicarAngulo(30);
                 break;
             case Direcao.Direita:
-                _anguloAtual = 120;
+                AplicarAngulo(120);
                 break;
             case Direcao.Baixo:
-                _anguloAtual = 210;
+                AplicarAngulo(210);
                 break;
             case Direcao.Esquerda:
-                _anguloAtual = 300;
+                AplicarAngulo(300);
                 break;
         }
-        if (picMosca != null && picMosca.Image != null)
-            picMosca.Image = RotacionarImagem(picMosca.Image, _anguloAtual);
     }
 
     public void AtivarTimers(bool ativar)

@@ -43,6 +43,9 @@
             btMaisUmaMosca = new Button();
             btMenosUmaMosca = new Button();
             lblTotalDeMoscas = new Label();
+            hsbAngulo = new HScrollBar();
+            lblAngulo = new Label();
+            chkPermitirAgarrarSoltar = new CheckBox();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -135,11 +138,43 @@
             lblTotalDeMoscas.TabIndex = 7;
             lblTotalDeMoscas.Text = "Total de moscas: 0";
             // 
+            // hsbAngulo
+            // 
+            hsbAngulo.Location = new Point(132, 62);
+            hsbAngulo.Maximum = 369;
+            hsbAngulo.Name = "hsbAngulo";
+            hsbAngulo.Size = new Size(245, 33);
+            hsbAngulo.TabIndex = 8;
+            hsbAngulo.Scroll += hsbAngulo_Scroll;
+            // 
+            // lblAngulo
+            // 
+            lblAngulo.AutoSize = true;
+            lblAngulo.Location = new Point(233, 41);
+            lblAngulo.Name = "lblAngulo";
+            lblAngulo.Size = new Size(21, 15);
+            lblAngulo.TabIndex = 9;
+            lblAngulo.Text = "0 º";
+            // 
+            // chkPermitirAgarrarSoltar
+            // 
+            chkPermitirAgarrarSoltar.AutoSize = true;
+            chkPermitirAgarrarSoltar.Location = new Point(12, 137);
+            chkPermitirAgarrarSoltar.Name = "chkPermitirAgarrarSoltar";
+            chkPermitirAgarrarSoltar.Size = new Size(149, 19);
+            chkPermitirAgarrarSoltar.TabIndex = 10;
+            chkPermitirAgarrarSoltar.Text = "Permitir agarrar e soltar";
+            chkPermitirAgarrarSoltar.UseVisualStyleBackColor = true;
+            chkPermitirAgarrarSoltar.CheckedChanged += chkTimers_CheckedChanged;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(386, 153);
+            ClientSize = new Size(386, 170);
+            Controls.Add(chkPermitirAgarrarSoltar);
+            Controls.Add(lblAngulo);
+            Controls.Add(hsbAngulo);
             Controls.Add(lblTotalDeMoscas);
             Controls.Add(btMenosUmaMosca);
             Controls.Add(btMaisUmaMosca);
@@ -167,5 +202,8 @@
         private Button btMaisUmaMosca;
         private Button btMenosUmaMosca;
         private Label lblTotalDeMoscas;
+        private HScrollBar hsbAngulo;
+        private Label lblAngulo;
+        private CheckBox chkPermitirAgarrarSoltar;
     }
 }

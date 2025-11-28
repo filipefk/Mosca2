@@ -7,6 +7,7 @@ public partial class frmPrincipal : Form
     private ContextMenuStrip? trayMenu;
     private int quantasMoscas = 1;
     private static readonly bool ModoControleRemoto = true;
+    
 
     public frmPrincipal()
     {
@@ -63,6 +64,7 @@ public partial class frmPrincipal : Form
                 mosca.AtivarTimerVoar(chkTimerVoar.Checked);
                 mosca.SeguirMouse = chkSeguirMouse.Checked;
                 mosca.ComSom = chkComSom.Checked;
+                mosca.PermitirAgarrarSoltar = chkPermitirAgarrarSoltar.Checked;
             }
             lblTotalDeMoscas.Text = $"Total de moscas: {moscas.Count}";
         }
@@ -148,13 +150,8 @@ public partial class frmPrincipal : Form
 
     private async void FilaIndiana()
     {
-        //var tasks = moscas.Select(mosca => mosca.FilaIndiana());
-        foreach (var mosca in moscas)
-        {
-            mosca.AtivarTimers(false);
-        }
-        //var tasks = moscas.Select(mosca => mosca.AtivarTimers(false));
-        //await Task.WhenAll(tasks);
+        var tasks = moscas.Select(mosca => mosca.FilaIndiana());
+        await Task.WhenAll(tasks);
     }
     private async void RodaGigante()
     {
@@ -211,5 +208,14 @@ public partial class frmPrincipal : Form
     {
         MenosMosca();
         AjustaPropriedades();
+    }
+
+    private void hsbAngulo_Scroll(object sender, ScrollEventArgs e)
+    {
+        lblAngulo.Text = $"{hsbAngulo.Value} °";
+        foreach (var mosca in moscas)
+        {
+            mosca.AplicarAngulo(hsbAngulo.Value);
+        }
     }
 }
