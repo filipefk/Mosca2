@@ -25,6 +25,13 @@ public partial class frmMosca : Form
         Direita
     }
 
+    public enum ComportamentoMouseEnum
+    {
+        FugirMouse,
+        SeguirMouse,
+        IgnorarMouse
+    }
+
     public frmMosca()
     {
         InitializeComponent();
@@ -70,7 +77,7 @@ public partial class frmMosca : Form
         this.Location = ForaDeTodasTelasAleatorio();
     }
 
-    public bool SeguirMouse { get; set; } = false;
+    public ComportamentoMouseEnum ComportamentoMouse { get; set; } = ComportamentoMouseEnum.FugirMouse;
     public bool ComSom { get; set; } = false;
     public bool PermitirAgarrarSoltar { get; set; } = false;
     public int Indice { get; set; } = -1;
@@ -79,14 +86,17 @@ public partial class frmMosca : Form
 
     private async void PicMosca_MouseEnter(object? sender, EventArgs e)
     {
-        if (SeguirMouse || _emVoo) return;
+        if (ComportamentoMouse == ComportamentoMouseEnum.SeguirMouse 
+            || ComportamentoMouse == ComportamentoMouseEnum.IgnorarMouse
+            || _emVoo) 
+            return;
         await Fugir();
     }
 
     private async void PicMosca_MouseClick(object? sender, EventArgs e)
     {
         if (_emVoo) return;
-        if (!PermitirAgarrarSoltar)
+        if (!PermitirAgarrarSoltar && ComportamentoMouse == ComportamentoMouseEnum.FugirMouse)
             await Fugir();
     }
 
@@ -213,12 +223,12 @@ public partial class frmMosca : Form
         if (_emVoo)
             return;
         Point destino;
-        if (SeguirMouse && _random.NextDouble() < 0.95)
+        if (ComportamentoMouse == ComportamentoMouseEnum.SeguirMouse && _random.NextDouble() < 0.95)
         {
             var mousePos = Cursor.Position;
             destino = new Point(mousePos.X - (this.Width / 2) + 50, mousePos.Y - (this.Height / 2) + 10);
         }
-        else if (!SeguirMouse && TemComida() && _random.NextDouble() < 0.95)
+        else if (ComportamentoMouse != ComportamentoMouseEnum.SeguirMouse && TemComida() && _random.NextDouble() < 0.95)
         {
             var comidas = ListaComidas();
             var comida = comidas[_random.Next(comidas.Count)];

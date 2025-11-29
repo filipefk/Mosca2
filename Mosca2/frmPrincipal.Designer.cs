@@ -43,7 +43,6 @@
             chkTimerMoverPernas = new CheckBox();
             chkTimerRotacao = new CheckBox();
             chkTimerVoar = new CheckBox();
-            chkSeguirMouse = new CheckBox();
             chkComSom = new CheckBox();
             btMaisUmaMosca = new Button();
             btMenosUmaMosca = new Button();
@@ -53,6 +52,8 @@
             chkPermitirAgarrarSoltar = new CheckBox();
             chkApontarParaMouse = new CheckBox();
             lblPosicaoMouse = new Label();
+            cboComportamentoMouse = new ComboBox();
+            label1 = new Label();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -75,9 +76,9 @@
             chkTimerRotacao.CheckState = CheckState.Checked;
             chkTimerRotacao.Location = new Point(12, 37);
             chkTimerRotacao.Name = "chkTimerRotacao";
-            chkTimerRotacao.Size = new Size(69, 19);
+            chkTimerRotacao.Size = new Size(118, 19);
             chkTimerRotacao.TabIndex = 1;
-            chkTimerRotacao.Text = "Rotação";
+            chkTimerRotacao.Text = "Rotação aleatório";
             chkTimerRotacao.UseVisualStyleBackColor = true;
             chkTimerRotacao.CheckedChanged += chkTimers_CheckedChanged;
             // 
@@ -88,27 +89,16 @@
             chkTimerVoar.CheckState = CheckState.Checked;
             chkTimerVoar.Location = new Point(12, 62);
             chkTimerVoar.Name = "chkTimerVoar";
-            chkTimerVoar.Size = new Size(49, 19);
+            chkTimerVoar.Size = new Size(98, 19);
             chkTimerVoar.TabIndex = 2;
-            chkTimerVoar.Text = "Voar";
+            chkTimerVoar.Text = "Voar aleatório";
             chkTimerVoar.UseVisualStyleBackColor = true;
             chkTimerVoar.CheckedChanged += chkTimers_CheckedChanged;
-            // 
-            // chkSeguirMouse
-            // 
-            chkSeguirMouse.AutoSize = true;
-            chkSeguirMouse.Location = new Point(12, 87);
-            chkSeguirMouse.Name = "chkSeguirMouse";
-            chkSeguirMouse.Size = new Size(108, 19);
-            chkSeguirMouse.TabIndex = 3;
-            chkSeguirMouse.Text = "Seguir o mouse";
-            chkSeguirMouse.UseVisualStyleBackColor = true;
-            chkSeguirMouse.CheckedChanged += chkTimers_CheckedChanged;
             // 
             // chkComSom
             // 
             chkComSom.AutoSize = true;
-            chkComSom.Location = new Point(12, 112);
+            chkComSom.Location = new Point(12, 87);
             chkComSom.Name = "chkComSom";
             chkComSom.Size = new Size(78, 19);
             chkComSom.TabIndex = 4;
@@ -118,7 +108,7 @@
             // 
             // btMaisUmaMosca
             // 
-            btMaisUmaMosca.Location = new Point(144, 7);
+            btMaisUmaMosca.Location = new Point(218, 7);
             btMaisUmaMosca.Name = "btMaisUmaMosca";
             btMaisUmaMosca.Size = new Size(25, 26);
             btMaisUmaMosca.TabIndex = 5;
@@ -128,7 +118,7 @@
             // 
             // btMenosUmaMosca
             // 
-            btMenosUmaMosca.Location = new Point(175, 7);
+            btMenosUmaMosca.Location = new Point(249, 7);
             btMenosUmaMosca.Name = "btMenosUmaMosca";
             btMenosUmaMosca.Size = new Size(25, 26);
             btMenosUmaMosca.TabIndex = 6;
@@ -139,7 +129,7 @@
             // lblTotalDeMoscas
             // 
             lblTotalDeMoscas.AutoSize = true;
-            lblTotalDeMoscas.Location = new Point(217, 13);
+            lblTotalDeMoscas.Location = new Point(291, 13);
             lblTotalDeMoscas.Name = "lblTotalDeMoscas";
             lblTotalDeMoscas.Size = new Size(104, 15);
             lblTotalDeMoscas.TabIndex = 7;
@@ -147,7 +137,7 @@
             // 
             // hsbAngulo
             // 
-            hsbAngulo.Location = new Point(132, 62);
+            hsbAngulo.Location = new Point(206, 62);
             hsbAngulo.Maximum = 369;
             hsbAngulo.Name = "hsbAngulo";
             hsbAngulo.Size = new Size(245, 33);
@@ -157,7 +147,7 @@
             // lblAngulo
             // 
             lblAngulo.AutoSize = true;
-            lblAngulo.Location = new Point(233, 41);
+            lblAngulo.Location = new Point(307, 41);
             lblAngulo.Name = "lblAngulo";
             lblAngulo.Size = new Size(21, 15);
             lblAngulo.TabIndex = 9;
@@ -166,7 +156,7 @@
             // chkPermitirAgarrarSoltar
             // 
             chkPermitirAgarrarSoltar.AutoSize = true;
-            chkPermitirAgarrarSoltar.Location = new Point(12, 137);
+            chkPermitirAgarrarSoltar.Location = new Point(12, 112);
             chkPermitirAgarrarSoltar.Name = "chkPermitirAgarrarSoltar";
             chkPermitirAgarrarSoltar.Size = new Size(149, 19);
             chkPermitirAgarrarSoltar.TabIndex = 10;
@@ -177,7 +167,7 @@
             // chkApontarParaMouse
             // 
             chkApontarParaMouse.AutoSize = true;
-            chkApontarParaMouse.Location = new Point(12, 162);
+            chkApontarParaMouse.Location = new Point(12, 137);
             chkApontarParaMouse.Name = "chkApontarParaMouse";
             chkApontarParaMouse.Size = new Size(144, 19);
             chkApontarParaMouse.TabIndex = 11;
@@ -188,17 +178,38 @@
             // lblPosicaoMouse
             // 
             lblPosicaoMouse.AutoSize = true;
-            lblPosicaoMouse.Location = new Point(132, 112);
+            lblPosicaoMouse.Location = new Point(206, 112);
             lblPosicaoMouse.Name = "lblPosicaoMouse";
             lblPosicaoMouse.Size = new Size(110, 15);
             lblPosicaoMouse.TabIndex = 12;
             lblPosicaoMouse.Text = "Posição do mouse: ";
             // 
+            // cboComportamentoMouse
+            // 
+            cboComportamentoMouse.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboComportamentoMouse.FormattingEnabled = true;
+            cboComportamentoMouse.Location = new Point(12, 183);
+            cboComportamentoMouse.Name = "cboComportamentoMouse";
+            cboComportamentoMouse.Size = new Size(162, 23);
+            cboComportamentoMouse.TabIndex = 13;
+            cboComportamentoMouse.SelectedIndexChanged += chkTimers_CheckedChanged;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new Point(12, 165);
+            label1.Name = "label1";
+            label1.Size = new Size(99, 15);
+            label1.TabIndex = 14;
+            label1.Text = "Comportamento:";
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(386, 206);
+            ClientSize = new Size(513, 236);
+            Controls.Add(label1);
+            Controls.Add(cboComportamentoMouse);
             Controls.Add(lblPosicaoMouse);
             Controls.Add(chkApontarParaMouse);
             Controls.Add(chkPermitirAgarrarSoltar);
@@ -208,7 +219,6 @@
             Controls.Add(btMenosUmaMosca);
             Controls.Add(btMaisUmaMosca);
             Controls.Add(chkComSom);
-            Controls.Add(chkSeguirMouse);
             Controls.Add(chkTimerVoar);
             Controls.Add(chkTimerRotacao);
             Controls.Add(chkTimerMoverPernas);
@@ -226,7 +236,6 @@
         private CheckBox chkTimerMoverPernas;
         private CheckBox chkTimerRotacao;
         private CheckBox chkTimerVoar;
-        private CheckBox chkSeguirMouse;
         private CheckBox chkComSom;
         private Button btMaisUmaMosca;
         private Button btMenosUmaMosca;
@@ -236,5 +245,7 @@
         private CheckBox chkPermitirAgarrarSoltar;
         private CheckBox chkApontarParaMouse;
         private Label lblPosicaoMouse;
+        private ComboBox cboComportamentoMouse;
+        private Label label1;
     }
 }

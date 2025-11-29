@@ -15,16 +15,17 @@ public partial class frmPrincipal : Form
     {
         InitializeComponent();
         trayMenu = new ContextMenuStrip();
-        trayMenu.Items.Add("Dar comida", null, (s, e) => DarComida());
-        trayMenu.Items.Add("Mais mosca", null, (s, e) => MaisMosca());
-        trayMenu.Items.Add("Menos mosca", null, (s, e) => MenosMosca());
-        trayMenu.Items.Add("Roubar o mouse", null, (s, e) => RoubarOMouse());
-        trayMenu.Items.Add("Com som", null, (s, e) => ComSom());
-        trayMenu.Items.Add("Sem som", null, (s, e) => SemSom());
-        trayMenu.Items.Add("Seguir o mouse", null, (s, e) => SeguirOMouse());
-        trayMenu.Items.Add("Fugir do mouse", null, (s, e) => FugirDoMouse());
-        trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => IniciarComandosAleatorios());
-        trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => PararComandosAleatorios());
+        trayMenu.Items.Add("Dar comida", null, (s, e) => MenuDarComida_Click());
+        trayMenu.Items.Add("Mais mosca", null, (s, e) => MenuMaisMosca_Click());
+        trayMenu.Items.Add("Menos mosca", null, (s, e) => MenuMenosMosca_Click());
+        trayMenu.Items.Add("Roubar o mouse", null, (s, e) => MenuRoubarOMouse_Click());
+        trayMenu.Items.Add("Com som", null, (s, e) => MenuComSom_Click());
+        trayMenu.Items.Add("Sem som", null, (s, e) => MenuSemSom_Click());
+        trayMenu.Items.Add("Seguir o mouse", null, (s, e) => MenuSeguirMouse_Click());
+        trayMenu.Items.Add("Fugir do mouse", null, (s, e) => MenuFugirDoMouse_Click());
+        trayMenu.Items.Add("Ignorar o mouse", null, (s, e) => MenuIgnorarMouse_Click());
+        trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => MenuIniciarComandosAleatorios_Click());
+        trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => MenuPararComandosAleatorios_Click());
         trayMenu.Items.Add("Dança loca", null, (s, e) => DancaLoca());
         trayMenu.Items.Add("Fila indiana", null, (s, e) => FilaIndiana());
         trayMenu.Items.Add("Roda gigante", null, (s, e) => RodaGigante());
@@ -68,6 +69,7 @@ public partial class frmPrincipal : Form
         if (ModoControleRemoto)
         {
             this.ShowInTaskbar = true;
+            PreencheComboComportamento();
             MostrarMoscas(1);
             AjustaPropriedades();
         }
@@ -80,6 +82,15 @@ public partial class frmPrincipal : Form
         }
     }
 
+    private void PreencheComboComportamento()
+    {
+        cboComportamentoMouse.Items.Clear();
+        cboComportamentoMouse.Items.Add("Fugir do mouse");
+        cboComportamentoMouse.Items.Add("Seguir o mouse");
+        cboComportamentoMouse.Items.Add("Ignorar o mouse");
+        cboComportamentoMouse.SelectedIndex = 0;
+    }
+
     private void AjustaPropriedades()
     {
         if (ModoControleRemoto)
@@ -89,7 +100,7 @@ public partial class frmPrincipal : Form
                 mosca.AtivarTimerMoverPernas(chkTimerMoverPernas.Checked);
                 mosca.AtivarTimerRotacao(chkTimerRotacao.Checked);
                 mosca.AtivarTimerVoar(chkTimerVoar.Checked);
-                mosca.SeguirMouse = chkSeguirMouse.Checked;
+                mosca.ComportamentoMouse = (frmMosca.ComportamentoMouseEnum)cboComportamentoMouse.SelectedIndex;
                 mosca.ComSom = chkComSom.Checked;
                 mosca.PermitirAgarrarSoltar = chkPermitirAgarrarSoltar.Checked;
             }
@@ -105,18 +116,18 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private async void DarComida()
+    private async void MenuDarComida_Click()
     {
         var comida = new frmComida();
         await comida.Mostrar();
     }
 
-    private void MaisMosca()
+    private void MenuMaisMosca_Click()
     {
         AdicionarNovaMosca();
     }
 
-    private void MenosMosca()
+    private void MenuMenosMosca_Click()
     {
         if (moscas.Count > 0)
         {
@@ -126,7 +137,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private async void RoubarOMouse()
+    private async void MenuRoubarOMouse_Click()
     {
         if (moscas.Count > 0)
         {
@@ -134,7 +145,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void ComSom()
+    private void MenuComSom_Click()
     {
         foreach (var mosca in moscas)
         {
@@ -142,7 +153,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void SemSom()
+    private void MenuSemSom_Click()
     {
         foreach (var mosca in moscas)
         {
@@ -150,24 +161,34 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private void SeguirOMouse()
+    private void MenuSeguirMouse_Click()
     {
         foreach (var mosca in moscas)
         {
-            mosca.SeguirMouse = true;
+            mosca.ComportamentoMouse = frmMosca.ComportamentoMouseEnum.SeguirMouse;
         }
     }
 
-    private void FugirDoMouse()
+    private void MenuFugirDoMouse_Click()
     {
         foreach (var mosca in moscas)
         {
-            mosca.SeguirMouse = false;
+            mosca.ComportamentoMouse = frmMosca.ComportamentoMouseEnum.FugirMouse;
         }
     }
 
-    private void IniciarComandosAleatorios() { }
-    private void PararComandosAleatorios() { }
+    private void MenuIgnorarMouse_Click()
+    {
+        foreach (var mosca in moscas)
+        {
+            mosca.ComportamentoMouse = frmMosca.ComportamentoMouseEnum.IgnorarMouse;
+        }
+    }
+
+
+
+    private void MenuIniciarComandosAleatorios_Click() { }
+    private void MenuPararComandosAleatorios_Click() { }
 
     private async void DancaLoca()
     {
@@ -227,13 +248,13 @@ public partial class frmPrincipal : Form
 
     private void btMaisUmaMosca_Click(object sender, EventArgs e)
     {
-        MaisMosca();
+        MenuMaisMosca_Click();
         AjustaPropriedades();
     }
 
     private void btMenosUmaMosca_Click(object sender, EventArgs e)
     {
-        MenosMosca();
+        MenuMenosMosca_Click();
         AjustaPropriedades();
     }
 
