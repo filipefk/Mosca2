@@ -59,6 +59,7 @@
             btRodaGigante = new Button();
             btDancaLoca = new Button();
             btDarComida = new Button();
+            chkMostrarIndice = new CheckBox();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -193,7 +194,7 @@
             // 
             cboComportamentoMouse.DropDownStyle = ComboBoxStyle.DropDownList;
             cboComportamentoMouse.FormattingEnabled = true;
-            cboComportamentoMouse.Location = new Point(12, 183);
+            cboComportamentoMouse.Location = new Point(12, 217);
             cboComportamentoMouse.Name = "cboComportamentoMouse";
             cboComportamentoMouse.Size = new Size(162, 23);
             cboComportamentoMouse.TabIndex = 13;
@@ -202,7 +203,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 165);
+            label1.Location = new Point(12, 199);
             label1.Name = "label1";
             label1.Size = new Size(99, 15);
             label1.TabIndex = 14;
@@ -258,11 +259,23 @@
             btDarComida.UseVisualStyleBackColor = true;
             btDarComida.Click += btDarComida_Click;
             // 
+            // chkMostrarIndice
+            // 
+            chkMostrarIndice.AutoSize = true;
+            chkMostrarIndice.Location = new Point(12, 162);
+            chkMostrarIndice.Name = "chkMostrarIndice";
+            chkMostrarIndice.Size = new Size(102, 19);
+            chkMostrarIndice.TabIndex = 20;
+            chkMostrarIndice.Text = "Mostrar indice";
+            chkMostrarIndice.UseVisualStyleBackColor = true;
+            chkMostrarIndice.CheckedChanged += chkTimers_CheckedChanged;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(451, 243);
+            ClientSize = new Size(451, 254);
+            Controls.Add(chkMostrarIndice);
             Controls.Add(btDarComida);
             Controls.Add(btDancaLoca);
             Controls.Add(btRodaGigante);
@@ -312,5 +325,6 @@
         private Button btRodaGigante;
         private Button btDancaLoca;
         private Button btDarComida;
+        private CheckBox chkMostrarIndice;
     }
 }

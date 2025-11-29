@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -110,6 +108,7 @@ public partial class frmPrincipal : Form
                 mosca.ComportamentoMouse = (frmMosca.ComportamentoMouseEnum)cboComportamentoMouse.SelectedIndex;
                 mosca.ComSom = chkComSom.Checked;
                 mosca.PermitirAgarrarSoltar = chkPermitirAgarrarSoltar.Checked;
+                mosca.MostrarIndice = chkMostrarIndice.Checked;
             }
             lblTotalDeMoscas.Text = $"Total de moscas: {moscas.Count}";
         }

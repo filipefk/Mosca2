@@ -78,7 +78,6 @@ public partial class frmComida : Form
         {
             var mousePos = MousePosition;
             this.Location = new Point(mousePos.X - _dragOffset.X, mousePos.Y - _dragOffset.Y);
-            MoscasTopMost();
         }
     }
 
@@ -87,6 +86,7 @@ public partial class frmComida : Form
         if (e.Button == MouseButtons.Left)
         {
             _dragging = false;
+            MoscasTopMost();
         }
     }
 }

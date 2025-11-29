@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             picMosca = new PictureBox();
+            lblIndice = new Label();
             ((System.ComponentModel.ISupportInitialize)picMosca).BeginInit();
             SuspendLayout();
             // 
@@ -42,11 +43,24 @@
             picMosca.TabIndex = 0;
             picMosca.TabStop = false;
             // 
+            // lblIndice
+            // 
+            lblIndice.AutoSize = true;
+            lblIndice.BackColor = Color.Transparent;
+            lblIndice.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
+            lblIndice.ForeColor = Color.OrangeRed;
+            lblIndice.Location = new Point(37, 0);
+            lblIndice.Name = "lblIndice";
+            lblIndice.Size = new Size(14, 15);
+            lblIndice.TabIndex = 1;
+            lblIndice.Text = "0";
+            // 
             // frmMosca
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(44, 46);
+            ClientSize = new Size(54, 47);
+            Controls.Add(lblIndice);
             Controls.Add(picMosca);
             FormBorderStyle = FormBorderStyle.None;
             Name = "frmMosca";
@@ -54,10 +68,12 @@
             Text = "frmMosca";
             ((System.ComponentModel.ISupportInitialize)picMosca).EndInit();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
 
         private PictureBox picMosca;
+        private Label lblIndice;
     }
 }

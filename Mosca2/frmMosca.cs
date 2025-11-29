@@ -16,6 +16,7 @@ public partial class frmMosca : Form
     private WaveStream? _mp3Reader;
     private bool _dragging = false;
     private Point _dragOffset;
+    private bool _mostrarIndice = false;
 
     public enum Direcao
     {
@@ -79,6 +80,18 @@ public partial class frmMosca : Form
 
     public ComportamentoMouseEnum ComportamentoMouse { get; set; } = ComportamentoMouseEnum.FugirMouse;
     public bool ComSom { get; set; } = false;
+    
+    public bool MostrarIndice 
+    {
+        get { return _mostrarIndice; }
+        set 
+        { 
+            _mostrarIndice = value;
+            lblIndice.Text = Indice.ToString();
+            lblIndice.Visible = _mostrarIndice;
+        }
+    }
+
     public bool PermitirAgarrarSoltar { get; set; } = false;
     public int Indice { get; set; } = -1;
 
