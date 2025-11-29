@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -7,7 +9,7 @@ public partial class frmPrincipal : Form
     private ContextMenuStrip? trayMenu;
     private int quantasMoscas = 1;
     private static readonly bool ModoControleRemoto = true;
-    
+    private GlobalMouseHook? globalMouseHook;
 
     public frmPrincipal()
     {
@@ -34,6 +36,31 @@ public partial class frmPrincipal : Form
         notifyIcon.ContextMenuStrip = trayMenu;
         notifyIcon.Visible = true;
         notifyIcon.MouseUp += NotifyIcon_MouseUp;
+
+        globalMouseHook = new GlobalMouseHook();
+        globalMouseHook.MouseMoved += GlobalMouseHook_MouseMoved;
+    }
+
+    private void GlobalMouseHook_MouseMoved(object? sender, Point e)
+    {
+        if (lblPosicaoMouse.InvokeRequired)
+        {
+            lblPosicaoMouse.Invoke(new Action(() =>
+            {
+                lblPosicaoMouse.Text = $"Posição do mouse: X = {e.X}, Y = {e.Y}";
+            }));
+        }
+        else
+        {
+            lblPosicaoMouse.Text = $"Posição do mouse: X = {e.X}, Y = {e.Y}";
+        }
+        if (chkApontarParaMouse.Checked)
+        {
+            foreach (var mosca in moscas)
+            {
+                mosca.ApontarPara(e);
+            }
+        }
     }
 
     private void frmPrincipal_Load(object sender, EventArgs e)

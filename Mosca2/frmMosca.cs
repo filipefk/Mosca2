@@ -97,6 +97,7 @@ public partial class frmMosca : Form
 
     public async Task VoarPara(Point destino, int velocidade = 0, bool levarMouse = false)
     {
+        if (_dragging) return;
         _destinoVoar = destino;
         await VoarPara(velocidade, levarMouse);
     }
@@ -193,7 +194,7 @@ public partial class frmMosca : Form
 
     private void TimerRotacao_Tick(object? sender, EventArgs e)
     {
-        RotacionarImagemMosca();
+        RotacionarMoscaAleatorio();
         ProximoIntervaloRotacao();
     }
 
@@ -260,10 +261,8 @@ public partial class frmMosca : Form
                     Cursor.Position = new Point(this.Left + this.Width / 2 - 50, this.Top + this.Height / 2 - 10);
                 break;
             }
+            ApontarParaDestinoVoar();
             double ang = Math.Atan2(dy, dx);
-            int anguloMosca = (int)(ang * 180 / Math.PI) + 135;
-            var novoAngulo = ((anguloMosca % 360) + 360) % 360;
-            AplicarAngulo(novoAngulo);
             int nx = this.Left + (int)(velocidade * Math.Cos(ang));
             int ny = this.Top + (int)(velocidade * Math.Sin(ang));
             this.Left = nx;
@@ -276,6 +275,30 @@ public partial class frmMosca : Form
             _waveOut.Stop();
         _emVoo = false;
         ProximoIntervaloVoar();
+    }
+
+    private void ApontarParaDestinoVoar()
+    {
+        ApontarPara(_destinoVoar.X, _destinoVoar.Y);
+    }
+
+    public void ApontarPara(int posX, int posY)
+    {
+        var point = new Point(posX, posY);
+        ApontarPara(point);
+    }
+
+    public void ApontarPara(Point point)
+    {
+        int dx = point.X - this.Left;
+        int dy = point.Y - this.Top;
+        // ângulo em radianos, 0 é para a direita, positivo sentido anti-horário
+        double angRad = Math.Atan2(dy, dx);
+        // converte para graus
+        int angDeg = (int)(angRad * 180 / Math.PI);
+        // ajusta para que 0 seja para cima (em vez de direita)
+        int anguloMosca = (angDeg + 90 + 360) % 360;
+        AplicarAngulo(anguloMosca);
     }
 
     public void AplicarAngulo(int angulo)
@@ -319,15 +342,59 @@ public partial class frmMosca : Form
         }
     }
 
-    private void RotacionarImagemMosca()
+    private async Task RotacionarSuaveAte(int anguloDestino, int passo = 30, int delayMs = 30)
+    {
+        int atual = _anguloAtual;
+        anguloDestino = ((anguloDestino % 360) + 360) % 360;
+        atual = ((atual % 360) + 360) % 360;
+        if (atual == anguloDestino) return;
+
+        int diff = (anguloDestino - atual + 360) % 360;
+        int sentido = diff <= 180 ? 1 : -1; // 1: horário, -1: anti-horário
+        int passos = 0;
+        while (atual != anguloDestino && passos < 100)
+        {
+            int prox = (atual + sentido * passo + 360) % 360;
+            // Se passar do destino, ajusta para o destino
+            if ((sentido == 1 && ((prox > anguloDestino && atual < anguloDestino) || (atual > anguloDestino && prox < atual))) ||
+                (sentido == -1 && ((prox < anguloDestino && atual > anguloDestino) || (atual < anguloDestino && prox > atual))))
+            {
+                prox = anguloDestino;
+            }
+            AplicarAngulo(prox);
+            atual = prox;
+            await Task.Delay(delayMs);
+            passos++;
+        }
+    }
+
+    public async Task OlharParaRotacionarSuave(Direcao onde)
+    {
+        switch (onde)
+        {
+            case Direcao.Cima:
+                await RotacionarSuaveAte(0);
+                break;
+            case Direcao.Direita:
+                await RotacionarSuaveAte(90);
+                break;
+            case Direcao.Baixo:
+                await RotacionarSuaveAte(180);
+                break;
+            case Direcao.Esquerda:
+                await RotacionarSuaveAte(270);
+                break;
+        }
+    }
+
+    private async void RotacionarMoscaAleatorio()
     {
         if (picMosca?.Image == null) return;
-        int[] angles = { 30, 50, 90 };
-        int angle = angles[_random.Next(angles.Length)];
+        int angle = _random.Next(0, 360);
         bool esquerda = _random.Next(2) == 0;
         if (!esquerda) angle = 360 - angle;
         var novoAngulo = (_anguloAtual + angle) % 360;
-        AplicarAngulo(novoAngulo);
+        await RotacionarSuaveAte(novoAngulo);
     }
 
     private Image RotacionarImagem(float angle, Image? img = null)
@@ -501,13 +568,13 @@ public partial class frmMosca : Form
 
         var destino = new Point(x, centerY);
         await VoarPara(destino, 120);
-        await OlharPara(Direcao.Direita);
+        await OlharParaRotacionarSuave(Direcao.Direita);
         await Task.Delay(1000);
-        await OlharPara(Direcao.Baixo);
+        await OlharParaRotacionarSuave(Direcao.Baixo);
         await Task.Delay(1000);
-        await OlharPara(Direcao.Esquerda);
+        await OlharParaRotacionarSuave(Direcao.Esquerda);
         await Task.Delay(1000);
-        await OlharPara(Direcao.Cima);
+        await OlharParaRotacionarSuave(Direcao.Cima);
 
         AtivarTimers(true);
     }
@@ -518,30 +585,15 @@ public partial class frmMosca : Form
         for (int i = 0; i < 4; i++)
         {
             await VoarPara(BordaMaisProxima(Direcao.Cima), 50);
+            Application.DoEvents();
             await VoarPara(BordaMaisProxima(Direcao.Direita), 50);
+            Application.DoEvents();
             await VoarPara(BordaMaisProxima(Direcao.Baixo), 50);
+            Application.DoEvents();
             await VoarPara(BordaMaisProxima(Direcao.Esquerda), 50);
+            Application.DoEvents();
         }
         AtivarTimers(true);
-    }
-
-    public async Task OlharPara(Direcao onde)
-    {
-        switch (onde)
-        {
-            case Direcao.Cima:
-                AplicarAngulo(30);
-                break;
-            case Direcao.Direita:
-                AplicarAngulo(120);
-                break;
-            case Direcao.Baixo:
-                AplicarAngulo(210);
-                break;
-            case Direcao.Esquerda:
-                AplicarAngulo(300);
-                break;
-        }
     }
 
     public void AtivarTimers(bool ativar)
@@ -599,7 +651,7 @@ public partial class frmMosca : Form
             // Se não estiver em nenhuma tela, usa a principal
             screen = Screen.PrimaryScreen;
         }
-        var area = screen.WorkingArea;
+        var area = screen!.WorkingArea;
 
         if (direcao != null)
         {

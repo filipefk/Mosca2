@@ -23,6 +23,11 @@
                 notifyIcon.Dispose();
                 notifyIcon = null;
             }
+            if (disposing && globalMouseHook != null)
+            {
+                globalMouseHook.Dispose();
+                globalMouseHook = null;
+            }
             base.Dispose(disposing);
         }
 
@@ -46,6 +51,8 @@
             hsbAngulo = new HScrollBar();
             lblAngulo = new Label();
             chkPermitirAgarrarSoltar = new CheckBox();
+            chkApontarParaMouse = new CheckBox();
+            lblPosicaoMouse = new Label();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -167,11 +174,33 @@
             chkPermitirAgarrarSoltar.UseVisualStyleBackColor = true;
             chkPermitirAgarrarSoltar.CheckedChanged += chkTimers_CheckedChanged;
             // 
+            // chkApontarParaMouse
+            // 
+            chkApontarParaMouse.AutoSize = true;
+            chkApontarParaMouse.Location = new Point(12, 162);
+            chkApontarParaMouse.Name = "chkApontarParaMouse";
+            chkApontarParaMouse.Size = new Size(144, 19);
+            chkApontarParaMouse.TabIndex = 11;
+            chkApontarParaMouse.Text = "Apontar para o mouse";
+            chkApontarParaMouse.UseVisualStyleBackColor = true;
+            chkApontarParaMouse.CheckedChanged += chkTimers_CheckedChanged;
+            // 
+            // lblPosicaoMouse
+            // 
+            lblPosicaoMouse.AutoSize = true;
+            lblPosicaoMouse.Location = new Point(132, 112);
+            lblPosicaoMouse.Name = "lblPosicaoMouse";
+            lblPosicaoMouse.Size = new Size(110, 15);
+            lblPosicaoMouse.TabIndex = 12;
+            lblPosicaoMouse.Text = "Posição do mouse: ";
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(386, 170);
+            ClientSize = new Size(386, 206);
+            Controls.Add(lblPosicaoMouse);
+            Controls.Add(chkApontarParaMouse);
             Controls.Add(chkPermitirAgarrarSoltar);
             Controls.Add(lblAngulo);
             Controls.Add(hsbAngulo);
@@ -205,5 +234,7 @@
         private HScrollBar hsbAngulo;
         private Label lblAngulo;
         private CheckBox chkPermitirAgarrarSoltar;
+        private CheckBox chkApontarParaMouse;
+        private Label lblPosicaoMouse;
     }
 }
