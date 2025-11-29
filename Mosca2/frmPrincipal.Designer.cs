@@ -54,6 +54,7 @@
             lblPosicaoMouse = new Label();
             cboComportamentoMouse = new ComboBox();
             label1 = new Label();
+            btEstrarEmForma = new Button();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -203,11 +204,22 @@
             label1.TabIndex = 14;
             label1.Text = "Comportamento:";
             // 
+            // btEstrarEmForma
+            // 
+            btEstrarEmForma.Location = new Point(206, 137);
+            btEstrarEmForma.Name = "btEstrarEmForma";
+            btEstrarEmForma.Size = new Size(110, 26);
+            btEstrarEmForma.TabIndex = 15;
+            btEstrarEmForma.Text = "Em forma!!!";
+            btEstrarEmForma.UseVisualStyleBackColor = true;
+            btEstrarEmForma.Click += btEstrarEmForma_Click;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(513, 236);
+            Controls.Add(btEstrarEmForma);
             Controls.Add(label1);
             Controls.Add(cboComportamentoMouse);
             Controls.Add(lblPosicaoMouse);
@@ -247,5 +259,6 @@
         private Label lblPosicaoMouse;
         private ComboBox cboComportamentoMouse;
         private Label label1;
+        private Button btEstrarEmForma;
     }
 }

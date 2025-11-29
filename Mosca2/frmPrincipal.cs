@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -15,10 +13,10 @@ public partial class frmPrincipal : Form
     {
         InitializeComponent();
         trayMenu = new ContextMenuStrip();
-        trayMenu.Items.Add("Dar comida", null, (s, e) => MenuDarComida_Click());
+        trayMenu.Items.Add("Dar comida", null, async (s, e) => await MenuDarComida_Click());
         trayMenu.Items.Add("Mais mosca", null, (s, e) => MenuMaisMosca_Click());
         trayMenu.Items.Add("Menos mosca", null, (s, e) => MenuMenosMosca_Click());
-        trayMenu.Items.Add("Roubar o mouse", null, (s, e) => MenuRoubarOMouse_Click());
+        trayMenu.Items.Add("Roubar o mouse", null, async (s, e) => await MenuRoubarOMouse_Click());
         trayMenu.Items.Add("Com som", null, (s, e) => MenuComSom_Click());
         trayMenu.Items.Add("Sem som", null, (s, e) => MenuSemSom_Click());
         trayMenu.Items.Add("Seguir o mouse", null, (s, e) => MenuSeguirMouse_Click());
@@ -26,9 +24,9 @@ public partial class frmPrincipal : Form
         trayMenu.Items.Add("Ignorar o mouse", null, (s, e) => MenuIgnorarMouse_Click());
         trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => MenuIniciarComandosAleatorios_Click());
         trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => MenuPararComandosAleatorios_Click());
-        trayMenu.Items.Add("Dança loca", null, (s, e) => DancaLoca());
-        trayMenu.Items.Add("Fila indiana", null, (s, e) => FilaIndiana());
-        trayMenu.Items.Add("Roda gigante", null, (s, e) => RodaGigante());
+        trayMenu.Items.Add("Dança loca", null, async (s, e) => await DancaLoca());
+        trayMenu.Items.Add("Fila indiana", null, async (s, e) => await FilaIndiana());
+        trayMenu.Items.Add("Roda gigante", null, async (s, e) => await RodaGigante());
         trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
 
         notifyIcon = new();
@@ -39,10 +37,10 @@ public partial class frmPrincipal : Form
         notifyIcon.MouseUp += NotifyIcon_MouseUp;
 
         globalMouseHook = new GlobalMouseHook();
-        globalMouseHook.MouseMoved += GlobalMouseHook_MouseMoved;
+        globalMouseHook.MouseMoved += async (s, e) => await GlobalMouseHook_MouseMoved(s, e);
     }
 
-    private void GlobalMouseHook_MouseMoved(object? sender, Point e)
+    private async Task GlobalMouseHook_MouseMoved(object? sender, Point e)
     {
         if (lblPosicaoMouse.InvokeRequired)
         {
@@ -57,10 +55,7 @@ public partial class frmPrincipal : Form
         }
         if (chkApontarParaMouse.Checked)
         {
-            foreach (var mosca in moscas)
-            {
-                mosca.ApontarPara(e);
-            }
+            Parallel.ForEach(moscas, async mosca => await mosca.ApontarPara(e));
         }
     }
 
@@ -116,7 +111,7 @@ public partial class frmPrincipal : Form
         }
     }
 
-    private async void MenuDarComida_Click()
+    private async Task MenuDarComida_Click()
     {
         var comida = new frmComida();
         await comida.Mostrar();
@@ -129,15 +124,10 @@ public partial class frmPrincipal : Form
 
     private void MenuMenosMosca_Click()
     {
-        if (moscas.Count > 0)
-        {
-            var mosca = moscas[0];
-            moscas.RemoveAt(0);
-            mosca.Morrer();
-        }
+        RemoverUmaMosca();
     }
 
-    private async void MenuRoubarOMouse_Click()
+    private async Task MenuRoubarOMouse_Click()
     {
         if (moscas.Count > 0)
         {
@@ -190,18 +180,18 @@ public partial class frmPrincipal : Form
     private void MenuIniciarComandosAleatorios_Click() { }
     private void MenuPararComandosAleatorios_Click() { }
 
-    private async void DancaLoca()
+    private async Task DancaLoca()
     {
         var tasks = moscas.Select(mosca => mosca.DancaLoca());
         await Task.WhenAll(tasks);
     }
 
-    private async void FilaIndiana()
+    private async Task FilaIndiana()
     {
         var tasks = moscas.Select(mosca => mosca.FilaIndiana());
         await Task.WhenAll(tasks);
     }
-    private async void RodaGigante()
+    private async Task RodaGigante()
     {
         var tasks = moscas.Select(mosca => mosca.RodaGigante());
         await Task.WhenAll(tasks);
@@ -210,6 +200,20 @@ public partial class frmPrincipal : Form
     private void MatarMoscas()
     {
         Application.Exit();
+    }
+
+    private async Task EntrarEmForma()
+    {
+        cboComportamentoMouse.SelectedIndex = 2;
+        chkTimerMoverPernas.Checked = false;
+        await FilaIndiana();
+        AjustaPropriedades();
+        chkTimerRotacao.Checked = false;
+        chkTimerVoar.Checked = false;
+        chkComSom.Checked = false;
+        chkPermitirAgarrarSoltar.Checked = true;
+        chkApontarParaMouse.Checked = true;
+        AjustaPropriedades();
     }
 
     private void MostrarMoscas(int quantas)
@@ -232,6 +236,20 @@ public partial class frmPrincipal : Form
         mosca.Indice = moscas.Count;
         mosca.Show();
         moscas.Add(mosca);
+    }
+
+    public void RemoverUmaMosca()
+    {
+        if (moscas.Count > 0)
+        {
+            var mosca = moscas[0];
+            moscas.RemoveAt(0);
+            mosca.Morrer();
+            for (int i = 0; i < moscas.Count; i++)
+            {
+                moscas[i].Indice = i;
+            }
+        }
     }
 
     private void FormTransparente()
@@ -258,12 +276,17 @@ public partial class frmPrincipal : Form
         AjustaPropriedades();
     }
 
-    private void hsbAngulo_Scroll(object sender, ScrollEventArgs e)
+    private async void hsbAngulo_Scroll(object sender, ScrollEventArgs e)
     {
         lblAngulo.Text = $"{hsbAngulo.Value} °";
         foreach (var mosca in moscas)
         {
             mosca.AplicarAngulo(hsbAngulo.Value);
         }
+    }
+
+    private async void btEstrarEmForma_Click(object sender, EventArgs e)
+    {
+        await EntrarEmForma();
     }
 }
