@@ -6,8 +6,11 @@ public partial class frmPrincipal : Form
     private NotifyIcon? notifyIcon;
     private ContextMenuStrip? trayMenu;
     private int quantasMoscas = 1;
-    private static readonly bool ModoControleRemoto = true;
     private GlobalMouseHook? globalMouseHook;
+
+
+    // AQUI ATIVA E DESATIVA O CONTROLE REMOTO
+    private static readonly bool ModoControleRemoto = true;
 
     public frmPrincipal()
     {
