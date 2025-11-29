@@ -96,7 +96,7 @@ public partial class frmMosca : Form
     private async void PicMosca_MouseClick(object? sender, EventArgs e)
     {
         if (_emVoo) return;
-        if (!PermitirAgarrarSoltar && ComportamentoMouse == ComportamentoMouseEnum.FugirMouse)
+        if (!PermitirAgarrarSoltar && ComportamentoMouse != ComportamentoMouseEnum.IgnorarMouse)
             await Fugir();
     }
 

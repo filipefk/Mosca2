@@ -55,6 +55,10 @@
             cboComportamentoMouse = new ComboBox();
             label1 = new Label();
             btEstrarEmForma = new Button();
+            btFilaIndiana = new Button();
+            btRodaGigante = new Button();
+            btDancaLoca = new Button();
+            btDarComida = new Button();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -206,7 +210,7 @@
             // 
             // btEstrarEmForma
             // 
-            btEstrarEmForma.Location = new Point(206, 137);
+            btEstrarEmForma.Location = new Point(322, 137);
             btEstrarEmForma.Name = "btEstrarEmForma";
             btEstrarEmForma.Size = new Size(110, 26);
             btEstrarEmForma.TabIndex = 15;
@@ -214,11 +218,55 @@
             btEstrarEmForma.UseVisualStyleBackColor = true;
             btEstrarEmForma.Click += btEstrarEmForma_Click;
             // 
+            // btFilaIndiana
+            // 
+            btFilaIndiana.Location = new Point(206, 169);
+            btFilaIndiana.Name = "btFilaIndiana";
+            btFilaIndiana.Size = new Size(110, 26);
+            btFilaIndiana.TabIndex = 16;
+            btFilaIndiana.Text = "Fila indiana";
+            btFilaIndiana.UseVisualStyleBackColor = true;
+            btFilaIndiana.Click += btFilaIndiana_Click;
+            // 
+            // btRodaGigante
+            // 
+            btRodaGigante.Location = new Point(206, 201);
+            btRodaGigante.Name = "btRodaGigante";
+            btRodaGigante.Size = new Size(110, 26);
+            btRodaGigante.TabIndex = 17;
+            btRodaGigante.Text = "Roda gigante";
+            btRodaGigante.UseVisualStyleBackColor = true;
+            btRodaGigante.Click += btRodaGigante_Click;
+            // 
+            // btDancaLoca
+            // 
+            btDancaLoca.Location = new Point(322, 169);
+            btDancaLoca.Name = "btDancaLoca";
+            btDancaLoca.Size = new Size(110, 26);
+            btDancaLoca.TabIndex = 18;
+            btDancaLoca.Text = "Dança loca";
+            btDancaLoca.UseVisualStyleBackColor = true;
+            btDancaLoca.Click += btDancaLoca_Click;
+            // 
+            // btDarComida
+            // 
+            btDarComida.Location = new Point(206, 137);
+            btDarComida.Name = "btDarComida";
+            btDarComida.Size = new Size(110, 26);
+            btDarComida.TabIndex = 19;
+            btDarComida.Text = "Dar comida";
+            btDarComida.UseVisualStyleBackColor = true;
+            btDarComida.Click += btDarComida_Click;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(513, 236);
+            ClientSize = new Size(451, 243);
+            Controls.Add(btDarComida);
+            Controls.Add(btDancaLoca);
+            Controls.Add(btRodaGigante);
+            Controls.Add(btFilaIndiana);
             Controls.Add(btEstrarEmForma);
             Controls.Add(label1);
             Controls.Add(cboComportamentoMouse);
@@ -237,7 +285,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "frmPrincipal";
             ShowInTaskbar = false;
-            Text = "Principal";
+            Text = "Controle remoto";
             Load += frmPrincipal_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -260,5 +308,9 @@
         private ComboBox cboComportamentoMouse;
         private Label label1;
         private Button btEstrarEmForma;
+        private Button btFilaIndiana;
+        private Button btRodaGigante;
+        private Button btDancaLoca;
+        private Button btDarComida;
     }
 }

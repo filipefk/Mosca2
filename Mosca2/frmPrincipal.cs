@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Mosca2;
 
 public partial class frmPrincipal : Form
@@ -15,29 +17,33 @@ public partial class frmPrincipal : Form
     public frmPrincipal()
     {
         InitializeComponent();
-        trayMenu = new ContextMenuStrip();
-        trayMenu.Items.Add("Dar comida", null, async (s, e) => await MenuDarComida_Click());
-        trayMenu.Items.Add("Mais mosca", null, (s, e) => MenuMaisMosca_Click());
-        trayMenu.Items.Add("Menos mosca", null, (s, e) => MenuMenosMosca_Click());
-        trayMenu.Items.Add("Roubar o mouse", null, async (s, e) => await MenuRoubarOMouse_Click());
-        trayMenu.Items.Add("Com som", null, (s, e) => MenuComSom_Click());
-        trayMenu.Items.Add("Sem som", null, (s, e) => MenuSemSom_Click());
-        trayMenu.Items.Add("Seguir o mouse", null, (s, e) => MenuSeguirMouse_Click());
-        trayMenu.Items.Add("Fugir do mouse", null, (s, e) => MenuFugirDoMouse_Click());
-        trayMenu.Items.Add("Ignorar o mouse", null, (s, e) => MenuIgnorarMouse_Click());
-        trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => MenuIniciarComandosAleatorios_Click());
-        trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => MenuPararComandosAleatorios_Click());
-        trayMenu.Items.Add("Dança loca", null, async (s, e) => await DancaLoca());
-        trayMenu.Items.Add("Fila indiana", null, async (s, e) => await FilaIndiana());
-        trayMenu.Items.Add("Roda gigante", null, async (s, e) => await RodaGigante());
-        trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
-
         notifyIcon = new();
         notifyIcon.Icon = this.Icon;
         notifyIcon.Text = "Bzzzzzz";
-        notifyIcon.ContextMenuStrip = trayMenu;
         notifyIcon.Visible = true;
-        notifyIcon.MouseUp += NotifyIcon_MouseUp;
+
+        if (!ModoControleRemoto)
+        {
+            trayMenu = new ContextMenuStrip();
+            trayMenu.Items.Add("Dar comida", null, async (s, e) => await MenuDarComida_Click());
+            trayMenu.Items.Add("Mais mosca", null, (s, e) => MenuMaisMosca_Click());
+            trayMenu.Items.Add("Menos mosca", null, (s, e) => MenuMenosMosca_Click());
+            trayMenu.Items.Add("Roubar o mouse", null, async (s, e) => await MenuRoubarOMouse_Click());
+            trayMenu.Items.Add("Com som", null, (s, e) => MenuComSom_Click());
+            trayMenu.Items.Add("Sem som", null, (s, e) => MenuSemSom_Click());
+            trayMenu.Items.Add("Seguir o mouse", null, (s, e) => MenuSeguirMouse_Click());
+            trayMenu.Items.Add("Fugir do mouse", null, (s, e) => MenuFugirDoMouse_Click());
+            trayMenu.Items.Add("Ignorar o mouse", null, (s, e) => MenuIgnorarMouse_Click());
+            trayMenu.Items.Add("Iniciar comando aleatórios", null, (s, e) => MenuIniciarComandosAleatorios_Click());
+            trayMenu.Items.Add("Parar comando aleatórios", null, (s, e) => MenuPararComandosAleatorios_Click());
+            trayMenu.Items.Add("Dança loca", null, async (s, e) => await DancaLoca());
+            trayMenu.Items.Add("Fila indiana", null, async (s, e) => await FilaIndiana());
+            trayMenu.Items.Add("Roda gigante", null, async (s, e) => await RodaGigante());
+            trayMenu.Items.Add("Matar moscas", null, (s, e) => MatarMoscas());
+
+            notifyIcon.ContextMenuStrip = trayMenu;
+            notifyIcon.MouseUp += NotifyIcon_MouseUp;
+        }
 
         globalMouseHook = new GlobalMouseHook();
         globalMouseHook.MouseMoved += async (s, e) => await GlobalMouseHook_MouseMoved(s, e);
@@ -70,6 +76,9 @@ public partial class frmPrincipal : Form
             PreencheComboComportamento();
             MostrarMoscas(1);
             AjustaPropriedades();
+            this.TopMost = true;
+            Application.DoEvents();
+            this.TopMost = false;
         }
         else
         {
@@ -193,6 +202,7 @@ public partial class frmPrincipal : Form
     {
         var tasks = moscas.Select(mosca => mosca.FilaIndiana());
         await Task.WhenAll(tasks);
+        AjustaPropriedades();
     }
     private async Task RodaGigante()
     {
@@ -291,5 +301,26 @@ public partial class frmPrincipal : Form
     private async void btEstrarEmForma_Click(object sender, EventArgs e)
     {
         await EntrarEmForma();
+    }
+
+    private async void btFilaIndiana_Click(object sender, EventArgs e)
+    {
+        await FilaIndiana();
+    }
+
+    private async void btRodaGigante_Click(object sender, EventArgs e)
+    {
+        await RodaGigante();
+    }
+
+    private async void btDancaLoca_Click(object sender, EventArgs e)
+    {
+        await DancaLoca();
+    }
+
+    private async void btDarComida_Click(object sender, EventArgs e)
+    {
+        var comida = new frmComida();
+        await comida.Mostrar();
     }
 }
