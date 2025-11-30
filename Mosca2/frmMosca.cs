@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using System.Windows.Forms;
 
 namespace Mosca2;
 
@@ -717,4 +718,99 @@ public partial class frmMosca : Form
         return new Point(area.Right, PosicaoAtual.Y);
     }
 
+    private Point CentroTelaPrincipal()
+    {
+        var screen = Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
+        int centroX = screen.Left + screen.Width / 2 - this.Width / 2;
+        int centroY = screen.Top + screen.Height / 2 - this.Height / 2;
+        return new Point(centroX, centroY);
+    }
+
+    public async Task FormacaoQuadrada(double fator = 1.5)
+    {
+        if (Indice < 0 || picMosca == null) return;
+
+        var destino = CalcularDeslocamentoQuadrado(fator);
+        await VoarPara(destino, 120);
+    }
+
+    private Point CalcularDeslocamentoQuadrado(double fator = 1.5)
+    {
+        if (Indice < 0 || picMosca == null) return new Point(0, 0);
+        int tamanho = picMosca.Width;
+        var deslocs = new (int dx, int dy)[]
+        {
+            (0, 0),                                         // 0 centro
+            ((int)(+fator*tamanho), 0),                     // 1 direita
+            ((int)(-fator*tamanho), 0),                     // 2 esquerda
+            (0, (int)(-fator*tamanho)),                     // 3 cima
+            ((int)(+fator*tamanho), (int)(-fator*tamanho)), // 4 cima-direita
+            ((int)(-fator*tamanho), (int)(-fator*tamanho)), // 5 cima-esquerda
+            (0, (int)(+fator*tamanho)),                     // 6 baixo
+            ((int)(+fator*tamanho), (int)(+fator*tamanho)), // 7 baixo-direita
+            ((int)(-fator*tamanho), (int)(+fator*tamanho)), // 8 baixo-esquerda
+
+            ((int)(+fator*(tamanho*2)), (int)(-fator*tamanho)), // 9
+            ((int)(+fator*(tamanho*2)), 0),                     // 10
+            ((int)(+fator*(tamanho*2)), (int)(+fator*tamanho)), // 11
+
+            ((int)(-fator*(tamanho*2)), (int)(-fator*tamanho)), // 12
+            ((int)(-fator*(tamanho*2)), 0),                     // 13
+            ((int)(-fator*(tamanho*2)), (int)(+fator*tamanho)), // 14
+
+            (0, (int)(-fator*(tamanho*2))),                     // 15
+            ((int)(+fator*tamanho), (int)(-fator*(tamanho*2))), // 16
+            ((int)(-fator*tamanho), (int)(-fator*(tamanho*2))), // 17
+
+            ((int)(+fator*(tamanho*2)), (int)(-fator*(tamanho*2))), // 18
+            ((int)(-fator*(tamanho*2)), (int)(-fator*(tamanho*2))), // 19
+
+            (0, (int)(+fator*(tamanho*2))),                         // 20
+            ((int)(+fator*tamanho), (int)(+fator*(tamanho*2))),     // 21
+            ((int)(-fator*tamanho), (int)(+fator*(tamanho*2))),     // 22
+            ((int)(+fator*(tamanho*2)), (int)(+fator*(tamanho*2))), // 23
+            ((int)(-fator*(tamanho*2)), (int)(+fator*(tamanho*2))), // 24
+
+            ((int)(+fator*(tamanho*3)), (int)(-fator*(tamanho*2))), // 25
+            ((int)(+fator*(tamanho*3)), (int)(-fator*tamanho)),     // 26
+            ((int)(+fator*(tamanho*3)), 0),                         // 27
+            ((int)(+fator*(tamanho*3)), (int)(+fator*tamanho)),     // 28
+            ((int)(+fator*(tamanho*3)), (int)(+fator*(tamanho*2))), // 29
+
+            ((int)(-fator*(tamanho*3)), (int)(-fator*(tamanho*2))), // 30
+            ((int)(-fator*(tamanho*3)), (int)(-fator*tamanho)),     // 31
+            ((int)(-fator*(tamanho*3)), 0),                         // 32
+            ((int)(-fator*(tamanho*3)), (int)(+fator*tamanho)),     // 33
+            ((int)(-fator*(tamanho*3)), (int)(+fator*(tamanho*2))), // 34
+
+            (0, (int)(-fator*(tamanho*3))),                         // 35
+            ((int)(+fator*tamanho), (int)(-fator*(tamanho*3))),     // 36
+            ((int)(-fator*tamanho), (int)(-fator*(tamanho*3))),     // 37
+            ((int)(+fator*(tamanho*2)), (int)(-fator*(tamanho*3))), // 38
+            ((int)(-fator*(tamanho*2)), (int)(-fator*(tamanho*3))), // 39
+            ((int)(+fator*(tamanho*3)), (int)(-fator*(tamanho*3))), // 40
+            ((int)(-fator*(tamanho*3)), (int)(-fator*(tamanho*3))), // 41
+
+            ((int)(+fator*(tamanho*4)), (int)(-fator*(tamanho*3))), // 42
+            ((int)(+fator*(tamanho*4)), (int)(-fator*(tamanho*2))), // 43
+            ((int)(+fator*(tamanho*4)), (int)(-fator*tamanho)),     // 44
+            ((int)(+fator*(tamanho*4)), 0),                         // 45
+            ((int)(+fator*(tamanho*4)), (int)(+fator*tamanho)),     // 46
+            ((int)(+fator*(tamanho*4)), (int)(+fator*(tamanho*2))), // 47
+
+            ((int)(-fator*(tamanho*4)), (int)(-fator*(tamanho*3))), // 48
+            ((int)(-fator*(tamanho*4)), (int)(-fator*(tamanho*2))), // 49
+            ((int)(-fator*(tamanho*4)), (int)(-fator*tamanho)),     // 50
+            ((int)(-fator*(tamanho*4)), 0),                         // 51
+            ((int)(-fator*(tamanho*4)), (int)(+fator*tamanho)),     // 52
+            ((int)(-fator*(tamanho*4)), (int)(+fator*(tamanho*2))), // 53
+
+        };
+
+        var centroTelaPrincipal = CentroTelaPrincipal();
+
+        var indiceDesloc = Indice % deslocs.Length;
+        return new Point(centroTelaPrincipal.X + deslocs[indiceDesloc].dx, centroTelaPrincipal.Y + deslocs[indiceDesloc].dy);
+
+    }
 }

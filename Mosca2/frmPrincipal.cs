@@ -203,6 +203,13 @@ public partial class frmPrincipal : Form
         await Task.WhenAll(tasks);
         AjustaPropriedades();
     }
+
+    private async Task FormacaoQuadrada()
+    {
+        var tasks = moscas.Select(mosca => mosca.FormacaoQuadrada());
+        await Task.WhenAll(tasks);
+    }
+
     private async Task RodaGigante()
     {
         var tasks = moscas.Select(mosca => mosca.RodaGigante());
@@ -218,7 +225,7 @@ public partial class frmPrincipal : Form
     {
         cboComportamentoMouse.SelectedIndex = 2;
         chkTimerMoverPernas.Checked = false;
-        await FilaIndiana();
+        await FormacaoQuadrada();
         AjustaPropriedades();
         chkTimerRotacao.Checked = false;
         chkTimerVoar.Checked = false;
@@ -321,5 +328,10 @@ public partial class frmPrincipal : Form
     {
         var comida = new frmComida();
         await comida.Mostrar();
+    }
+
+    private async void btFormacaoQuadrada_Click(object sender, EventArgs e)
+    {
+        await FormacaoQuadrada();
     }
 }

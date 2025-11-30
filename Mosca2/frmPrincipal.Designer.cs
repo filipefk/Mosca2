@@ -60,6 +60,7 @@
             btDancaLoca = new Button();
             btDarComida = new Button();
             chkMostrarIndice = new CheckBox();
+            btFormacaoQuadrada = new Button();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -211,9 +212,9 @@
             // 
             // btEstrarEmForma
             // 
-            btEstrarEmForma.Location = new Point(322, 137);
+            btEstrarEmForma.Location = new Point(341, 137);
             btEstrarEmForma.Name = "btEstrarEmForma";
-            btEstrarEmForma.Size = new Size(110, 26);
+            btEstrarEmForma.Size = new Size(129, 26);
             btEstrarEmForma.TabIndex = 15;
             btEstrarEmForma.Text = "Em forma!!!";
             btEstrarEmForma.UseVisualStyleBackColor = true;
@@ -223,7 +224,7 @@
             // 
             btFilaIndiana.Location = new Point(206, 169);
             btFilaIndiana.Name = "btFilaIndiana";
-            btFilaIndiana.Size = new Size(110, 26);
+            btFilaIndiana.Size = new Size(129, 26);
             btFilaIndiana.TabIndex = 16;
             btFilaIndiana.Text = "Fila indiana";
             btFilaIndiana.UseVisualStyleBackColor = true;
@@ -233,7 +234,7 @@
             // 
             btRodaGigante.Location = new Point(206, 201);
             btRodaGigante.Name = "btRodaGigante";
-            btRodaGigante.Size = new Size(110, 26);
+            btRodaGigante.Size = new Size(129, 26);
             btRodaGigante.TabIndex = 17;
             btRodaGigante.Text = "Roda gigante";
             btRodaGigante.UseVisualStyleBackColor = true;
@@ -241,9 +242,9 @@
             // 
             // btDancaLoca
             // 
-            btDancaLoca.Location = new Point(322, 169);
+            btDancaLoca.Location = new Point(341, 169);
             btDancaLoca.Name = "btDancaLoca";
-            btDancaLoca.Size = new Size(110, 26);
+            btDancaLoca.Size = new Size(129, 26);
             btDancaLoca.TabIndex = 18;
             btDancaLoca.Text = "Dança loca";
             btDancaLoca.UseVisualStyleBackColor = true;
@@ -253,7 +254,7 @@
             // 
             btDarComida.Location = new Point(206, 137);
             btDarComida.Name = "btDarComida";
-            btDarComida.Size = new Size(110, 26);
+            btDarComida.Size = new Size(129, 26);
             btDarComida.TabIndex = 19;
             btDarComida.Text = "Dar comida";
             btDarComida.UseVisualStyleBackColor = true;
@@ -270,11 +271,22 @@
             chkMostrarIndice.UseVisualStyleBackColor = true;
             chkMostrarIndice.CheckedChanged += chkTimers_CheckedChanged;
             // 
+            // btFormacaoQuadrada
+            // 
+            btFormacaoQuadrada.Location = new Point(341, 201);
+            btFormacaoQuadrada.Name = "btFormacaoQuadrada";
+            btFormacaoQuadrada.Size = new Size(129, 26);
+            btFormacaoQuadrada.TabIndex = 21;
+            btFormacaoQuadrada.Text = "Formação quadrada";
+            btFormacaoQuadrada.UseVisualStyleBackColor = true;
+            btFormacaoQuadrada.Click += btFormacaoQuadrada_Click;
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(451, 254);
+            ClientSize = new Size(487, 255);
+            Controls.Add(btFormacaoQuadrada);
             Controls.Add(chkMostrarIndice);
             Controls.Add(btDarComida);
             Controls.Add(btDancaLoca);
@@ -326,5 +338,6 @@
         private Button btDancaLoca;
         private Button btDarComida;
         private CheckBox chkMostrarIndice;
+        private Button btFormacaoQuadrada;
     }
 }
