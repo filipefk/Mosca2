@@ -1,5 +1,4 @@
 ﻿using NAudio.Wave;
-using System.Windows.Forms;
 
 namespace Mosca2;
 
@@ -9,11 +8,11 @@ public partial class frmMosca : Form
     private readonly System.Windows.Forms.Timer _timerRotacao;
     private readonly System.Windows.Forms.Timer _timerVoar;
     private static readonly Random _random = new();
-    private readonly string[] _moscaImages = { "Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5" };
+    private readonly string[] _moscaImages = [ "Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5" ];
     private int _anguloAtual = 0;
     private Point _destinoVoar;
     private bool _emVoo = false;
-    private IWavePlayer? _waveOut;
+    private WaveOutEvent? _waveOut;
     private WaveStream? _mp3Reader;
     private bool _dragging = false;
     private Point _dragOffset;
@@ -81,12 +80,12 @@ public partial class frmMosca : Form
 
     public ComportamentoMouseEnum ComportamentoMouse { get; set; } = ComportamentoMouseEnum.FugirMouse;
     public bool ComSom { get; set; } = false;
-    
-    public bool MostrarIndice 
+
+    public bool MostrarIndice
     {
         get { return _mostrarIndice; }
-        set 
-        { 
+        set
+        {
             _mostrarIndice = value;
             lblIndice.Text = Indice.ToString();
             lblIndice.Visible = _mostrarIndice;
@@ -133,7 +132,7 @@ public partial class frmMosca : Form
         var rotacaoAtiva = _timerRotacao.Enabled;
         if (rotacaoAtiva)
             _timerRotacao.Enabled = false;
-        await Voar(velocidade, levarMouse);
+        await VoarSinuoso(velocidade, levarMouse);
         if (rotacaoAtiva)
             _timerRotacao.Enabled = true;
     }
@@ -259,6 +258,57 @@ public partial class frmMosca : Form
             destino = DestinoVoarAleatorio();
         }
         await VoarPara(destino);
+    }
+
+    private async Task VoarSinuoso(int velocidade = 0, bool levarMouse = false)
+    {
+        if (ComSom && _waveOut != null && _mp3Reader != null)
+        {
+            _mp3Reader.Position = 0;
+            float[] volumes = { 1.0f, 0.8f, 0.5f, 0.3f, 0.1f };
+            _waveOut.Volume = volumes[_random.Next(volumes.Length)];
+            _waveOut.Play();
+            await Task.Delay(100);
+        }
+        velocidade = velocidade == 0 ? _random.Next(80, 201) : velocidade;
+
+        int startX = this.Left;
+        int startY = this.Top;
+        int endX = _destinoVoar.X;
+        int endY = _destinoVoar.Y;
+        int totalDist = (int)Math.Sqrt((endX - startX) * (endX - startX) + (endY - startY) * (endY - startY));
+        double freq = _random.NextDouble() * 1.5 + 0.5; // frequência aleatória
+        int amplitude = _random.Next(0, 200); // amplitude do desvio
+        double angle = Math.Atan2(endY - startY, endX - startX);
+        double perpAngle = angle + Math.PI / 2.0;
+        int perc = 0;
+        while (perc < totalDist)
+        {
+            double t = (double)perc / (double)Math.Max(1, totalDist); // 0..1
+            // Posição base ao longo da linha
+            double baseX = startX + t * (endX - startX);
+            double baseY = startY + t * (endY - startY);
+            // Desvio perpendicular
+            double desvio = Math.Sin(t * Math.PI * freq) * amplitude;
+            int nx = (int)(baseX + desvio * Math.Cos(perpAngle));
+            int ny = (int)(baseY + desvio * Math.Sin(perpAngle));
+            await ApontarPara(nx, ny);
+            this.Left = nx;
+            this.Top = ny;
+            if (levarMouse)
+                Cursor.Position = new Point(this.Left + this.Width / 2 - 50, this.Top + this.Height / 2 - 10);
+            await Task.Delay(8);
+            perc += velocidade;
+        }
+        // Garante que termina exatamente no destino
+        this.Left = endX;
+        this.Top = endY;
+        if (levarMouse)
+            Cursor.Position = new Point(this.Left + this.Width / 2 - 50, this.Top + this.Height / 2 - 10);
+        if (_waveOut != null)
+            _waveOut.Stop();
+        _emVoo = false;
+        ProximoIntervaloVoar();
     }
 
     private async Task Voar(int velocidade = 0, bool levarMouse = false)

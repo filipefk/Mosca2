@@ -73,9 +73,29 @@ namespace Mosca2.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap LixoSombra {
+            get {
+                object obj = ResourceManager.GetObject("LixoSombra", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Merda {
             get {
                 object obj = ResourceManager.GetObject("Merda", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap MerdaSombra {
+            get {
+                object obj = ResourceManager.GetObject("MerdaSombra", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -6,6 +6,7 @@ public partial class frmComida : Form
     private readonly Random _random = new();
     private Point _dragOffset;
     private bool _dragging = false;
+    private string? _imagemAtual;
 
     public frmComida()
     {
@@ -36,9 +37,16 @@ public partial class frmComida : Form
 
         // Sorteia imagem
         if (_random.Next(2) == 0)
+        {
             picComida.Image = Properties.Resources.Merda;
+            _imagemAtual = "Merda";
+        }
         else
+        {
             picComida.Image = Properties.Resources.Lixo;
+            _imagemAtual = "Lixo";
+        }
+
 
         // Sorteia tempo de exibição
         int tempoMs = _random.Next(10, 31) * 1000;
@@ -69,6 +77,14 @@ public partial class frmComida : Form
         {
             _dragging = true;
             _dragOffset = new Point(e.X, e.Y);
+            if (_imagemAtual == "Merda")
+            {
+                picComida.Image = Properties.Resources.MerdaSombra;
+            }
+            else if (_imagemAtual == "Lixo")
+            {
+                picComida.Image = Properties.Resources.LixoSombra;
+            }
         }
     }
 
@@ -86,6 +102,14 @@ public partial class frmComida : Form
         if (e.Button == MouseButtons.Left)
         {
             _dragging = false;
+            if (_imagemAtual == "Merda")
+            {
+                picComida.Image = Properties.Resources.Merda;
+            }
+            else if (_imagemAtual == "Lixo")
+            {
+                picComida.Image = Properties.Resources.Lixo;
+            }
             MoscasTopMost();
         }
     }
