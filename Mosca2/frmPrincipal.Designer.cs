@@ -61,6 +61,9 @@
             btDarComida = new Button();
             chkMostrarIndice = new CheckBox();
             btFormacaoQuadrada = new Button();
+            nudVelocidade = new NumericUpDown();
+            label2 = new Label();
+            ((System.ComponentModel.ISupportInitialize)nudVelocidade).BeginInit();
             SuspendLayout();
             // 
             // chkTimerMoverPernas
@@ -185,7 +188,7 @@
             // lblPosicaoMouse
             // 
             lblPosicaoMouse.AutoSize = true;
-            lblPosicaoMouse.Location = new Point(206, 112);
+            lblPosicaoMouse.Location = new Point(206, 144);
             lblPosicaoMouse.Name = "lblPosicaoMouse";
             lblPosicaoMouse.Size = new Size(110, 15);
             lblPosicaoMouse.TabIndex = 12;
@@ -212,7 +215,7 @@
             // 
             // btEstrarEmForma
             // 
-            btEstrarEmForma.Location = new Point(341, 137);
+            btEstrarEmForma.Location = new Point(341, 169);
             btEstrarEmForma.Name = "btEstrarEmForma";
             btEstrarEmForma.Size = new Size(129, 26);
             btEstrarEmForma.TabIndex = 15;
@@ -222,7 +225,7 @@
             // 
             // btFilaIndiana
             // 
-            btFilaIndiana.Location = new Point(206, 169);
+            btFilaIndiana.Location = new Point(206, 201);
             btFilaIndiana.Name = "btFilaIndiana";
             btFilaIndiana.Size = new Size(129, 26);
             btFilaIndiana.TabIndex = 16;
@@ -232,7 +235,7 @@
             // 
             // btRodaGigante
             // 
-            btRodaGigante.Location = new Point(206, 201);
+            btRodaGigante.Location = new Point(206, 233);
             btRodaGigante.Name = "btRodaGigante";
             btRodaGigante.Size = new Size(129, 26);
             btRodaGigante.TabIndex = 17;
@@ -242,7 +245,7 @@
             // 
             // btDancaLoca
             // 
-            btDancaLoca.Location = new Point(341, 169);
+            btDancaLoca.Location = new Point(341, 201);
             btDancaLoca.Name = "btDancaLoca";
             btDancaLoca.Size = new Size(129, 26);
             btDancaLoca.TabIndex = 18;
@@ -252,7 +255,7 @@
             // 
             // btDarComida
             // 
-            btDarComida.Location = new Point(206, 137);
+            btDarComida.Location = new Point(206, 169);
             btDarComida.Name = "btDarComida";
             btDarComida.Size = new Size(129, 26);
             btDarComida.TabIndex = 19;
@@ -273,7 +276,7 @@
             // 
             // btFormacaoQuadrada
             // 
-            btFormacaoQuadrada.Location = new Point(341, 201);
+            btFormacaoQuadrada.Location = new Point(341, 233);
             btFormacaoQuadrada.Name = "btFormacaoQuadrada";
             btFormacaoQuadrada.Size = new Size(129, 26);
             btFormacaoQuadrada.TabIndex = 21;
@@ -281,11 +284,33 @@
             btFormacaoQuadrada.UseVisualStyleBackColor = true;
             btFormacaoQuadrada.Click += btFormacaoQuadrada_Click;
             // 
+            // nudVelocidade
+            // 
+            nudVelocidade.Increment = new decimal(new int[] { 30, 0, 0, 0 });
+            nudVelocidade.Location = new Point(358, 111);
+            nudVelocidade.Maximum = new decimal(new int[] { 1000, 0, 0, 0 });
+            nudVelocidade.Name = "nudVelocidade";
+            nudVelocidade.Size = new Size(46, 23);
+            nudVelocidade.TabIndex = 22;
+            nudVelocidade.ValueChanged += nudVelocidade_ValueChanged;
+            nudVelocidade.KeyPress += nudVelocidade_KeyPress;
+            // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(206, 113);
+            label2.Name = "label2";
+            label2.Size = new Size(146, 15);
+            label2.TabIndex = 23;
+            label2.Text = "Velocidade padrão de voo:";
+            // 
             // frmPrincipal
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(487, 255);
+            ClientSize = new Size(487, 275);
+            Controls.Add(label2);
+            Controls.Add(nudVelocidade);
             Controls.Add(btFormacaoQuadrada);
             Controls.Add(chkMostrarIndice);
             Controls.Add(btDarComida);
@@ -312,6 +337,7 @@
             ShowInTaskbar = false;
             Text = "Controle remoto";
             Load += frmPrincipal_Load;
+            ((System.ComponentModel.ISupportInitialize)nudVelocidade).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -339,5 +365,7 @@
         private Button btDarComida;
         private CheckBox chkMostrarIndice;
         private Button btFormacaoQuadrada;
+        private NumericUpDown nudVelocidade;
+        private Label label2;
     }
 }

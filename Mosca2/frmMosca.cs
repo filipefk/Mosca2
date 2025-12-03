@@ -97,6 +97,8 @@ public partial class frmMosca : Form
 
     public Point PosicaoAtual { get => new Point(this.Left, this.Top); }
 
+    public uint VelocidadePadrao { get; set; } = 0;
+
     private async void PicMosca_MouseEnter(object? sender, EventArgs e)
     {
         if (ComportamentoMouse == ComportamentoMouseEnum.SeguirMouse
@@ -118,14 +120,15 @@ public partial class frmMosca : Form
         await VoarPara(DestinoVoarAleatorio());
     }
 
-    public async Task VoarPara(Point destino, int velocidade = 0, bool levarMouse = false)
+    public async Task VoarPara(Point destino, uint velocidade = 0, bool levarMouse = false)
     {
         if (_dragging) return;
         _destinoVoar = destino;
+        velocidade = velocidade == 0 ? VelocidadePadrao : velocidade;
         await VoarPara(velocidade, levarMouse);
     }
 
-    public async Task VoarPara(int velocidade = 0, bool levarMouse = false)
+    public async Task VoarPara(uint velocidade = 0, bool levarMouse = false)
     {
         if (_dragging) return;
         _emVoo = true;
@@ -260,7 +263,7 @@ public partial class frmMosca : Form
         await VoarPara(destino);
     }
 
-    private async Task VoarSinuoso(int velocidade = 0, bool levarMouse = false)
+    private async Task VoarSinuoso(uint velocidade = 0, bool levarMouse = false)
     {
         if (ComSom && _waveOut != null && _mp3Reader != null)
         {
@@ -270,7 +273,7 @@ public partial class frmMosca : Form
             _waveOut.Play();
             await Task.Delay(100);
         }
-        velocidade = velocidade == 0 ? _random.Next(80, 201) : velocidade;
+        velocidade = velocidade == 0 ? (uint)_random.Next(80, 201) : velocidade;
 
         int startX = this.Left;
         int startY = this.Top;
@@ -281,7 +284,7 @@ public partial class frmMosca : Form
         int amplitude = _random.Next(0, 200); // amplitude do desvio
         double angle = Math.Atan2(endY - startY, endX - startX);
         double perpAngle = angle + Math.PI / 2.0;
-        int perc = 0;
+        uint perc = 0;
         while (perc < totalDist)
         {
             double t = (double)perc / (double)Math.Max(1, totalDist); // 0..1

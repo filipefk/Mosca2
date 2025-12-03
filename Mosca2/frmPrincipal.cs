@@ -334,4 +334,17 @@ public partial class frmPrincipal : Form
     {
         await FormacaoQuadrada();
     }
+
+    private void nudVelocidade_ValueChanged(object sender, EventArgs e)
+    {
+        foreach (var mosca in moscas)
+        {
+            mosca.VelocidadePadrao = (uint)nudVelocidade.Value;
+        }
+    }
+
+    private void nudVelocidade_KeyPress(object sender, KeyPressEventArgs e)
+    {
+        
+    }
 }
