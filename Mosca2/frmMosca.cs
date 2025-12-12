@@ -8,7 +8,7 @@ public partial class frmMosca : Form
     private readonly System.Windows.Forms.Timer _timerRotacao;
     private readonly System.Windows.Forms.Timer _timerVoar;
     private static readonly Random _random = new();
-    private readonly string[] _moscaImages = [ "Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5" ];
+    private readonly string[] _moscaImages = ["Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5"];
     private int _anguloAtual = 0;
     private Point _destinoVoar;
     private bool _emVoo = false;

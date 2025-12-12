@@ -345,6 +345,6 @@ public partial class frmPrincipal : Form
 
     private void nudVelocidade_KeyPress(object sender, KeyPressEventArgs e)
     {
-        
+
     }
 }
