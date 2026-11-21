@@ -5,7 +5,7 @@ Name: "brazilian"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 AppName=Mosca
 AppVersion=2.0.0
 AppPublisher=Boca Software
-DefaultDirName={pf}\Mosca
+DefaultDirName={autopf}\Mosca
 DefaultGroupName=Mosca
 OutputDir=.
 SetupIconFile="..\Mosca.ico"
@@ -14,10 +14,12 @@ OutputBaseFilename=Mosca-2.0.0
 Compression=lzma
 SolidCompression=yes
 DisableProgramGroupPage=yes
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 
 [Files]
-; Copia todos os arquivos da pasta Release para a pasta de instalação
-Source: "..\bin\Release\net10.0-windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; Copia todos os arquivos da pasta Publicar para a pasta de instalação
+Source: "..\bin\Publicar\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "..\Mosca.ico"; DestDir: "{app}"
 
 [Icons]
