@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Mosca2
 {
     internal static class Program
@@ -11,7 +13,21 @@ namespace Mosca2
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new frmPrincipal());
+            timeBeginPeriod(1);
+            try
+            {
+                Application.Run(new frmPrincipal());
+            }
+            finally
+            {
+                timeEndPeriod(1);
+            }
         }
+
+        [DllImport("winmm.dll")]
+        private static extern uint timeBeginPeriod(uint uPeriod);
+
+        [DllImport("winmm.dll")]
+        private static extern uint timeEndPeriod(uint uPeriod);
     }
 }

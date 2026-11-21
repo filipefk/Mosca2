@@ -17,6 +17,10 @@
             {
                 components.Dispose();
             }
+            if (disposing)
+            {
+                LiberarRecursos();
+            }
             base.Dispose(disposing);
         }
 
@@ -28,35 +32,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            picComida = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)picComida).BeginInit();
             SuspendLayout();
-            // 
-            // picComida
-            // 
-            picComida.Image = Properties.Resources.Lixo;
-            picComida.Location = new Point(0, -1);
-            picComida.Name = "picComida";
-            picComida.Size = new Size(72, 65);
-            picComida.SizeMode = PictureBoxSizeMode.StretchImage;
-            picComida.TabIndex = 0;
-            picComida.TabStop = false;
-            // 
+            //
             // frmComida
-            // 
-            AutoScaleDimensions = new SizeF(7F, 15F);
-            AutoScaleMode = AutoScaleMode.Font;
+            //
+            AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(74, 66);
-            Controls.Add(picComida);
             FormBorderStyle = FormBorderStyle.None;
             Name = "frmComida";
             Text = "frmComida";
-            ((System.ComponentModel.ISupportInitialize)picComida).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
-
-        private PictureBox picComida;
     }
 }

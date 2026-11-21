@@ -60,10 +60,14 @@ public partial class frmPrincipal : Form
         {
             lblPosicaoMouse.Text = $"Posição do mouse: X = {e.X}, Y = {e.Y}";
         }
+        var moscasAtuais = moscas.ToList();
         if (chkApontarParaMouse.Checked)
         {
-            Parallel.ForEach(moscas, async mosca => await mosca.ApontarPara(e));
+            foreach (var mosca in moscasAtuais)
+                await mosca.ApontarPara(e);
         }
+        foreach (var mosca in moscasAtuais)
+            mosca.CursorMoveu(e);
     }
 
     private void frmPrincipal_Load(object sender, EventArgs e)
@@ -104,6 +108,7 @@ public partial class frmPrincipal : Form
             {
                 mosca.AtivarTimerMoverPernas(chkTimerMoverPernas.Checked);
                 mosca.AtivarTimerRotacao(chkTimerRotacao.Checked);
+                mosca.AtivarTimerCaminhar(chkTimerCaminhar.Checked);
                 mosca.AtivarTimerVoar(chkTimerVoar.Checked);
                 mosca.ComportamentoMouse = (frmMosca.ComportamentoMouseEnum)cboComportamentoMouse.SelectedIndex;
                 mosca.ComSom = chkComSom.Checked;
@@ -225,11 +230,12 @@ public partial class frmPrincipal : Form
     {
         cboComportamentoMouse.SelectedIndex = 2;
         chkTimerMoverPernas.Checked = false;
-        await FormacaoQuadrada();
-        AjustaPropriedades();
         chkTimerRotacao.Checked = false;
+        chkTimerCaminhar.Checked = false;
         chkTimerVoar.Checked = false;
         chkComSom.Checked = false;
+        AjustaPropriedades();
+        await FormacaoQuadrada();
         chkPermitirAgarrarSoltar.Checked = true;
         chkApontarParaMouse.Checked = true;
         AjustaPropriedades();

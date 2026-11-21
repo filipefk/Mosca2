@@ -42,6 +42,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPrincipal));
             chkTimerMoverPernas = new CheckBox();
             chkTimerRotacao = new CheckBox();
+            chkTimerCaminhar = new CheckBox();
             chkTimerVoar = new CheckBox();
             chkComSom = new CheckBox();
             btMaisUmaMosca = new Button();
@@ -91,16 +92,29 @@
             chkTimerRotacao.Text = "Rotação aleatório";
             chkTimerRotacao.UseVisualStyleBackColor = true;
             chkTimerRotacao.CheckedChanged += chkTimers_CheckedChanged;
-            // 
+            //
+            // chkTimerCaminhar
+            //
+            chkTimerCaminhar.AutoSize = true;
+            chkTimerCaminhar.Checked = true;
+            chkTimerCaminhar.CheckState = CheckState.Checked;
+            chkTimerCaminhar.Location = new Point(12, 62);
+            chkTimerCaminhar.Name = "chkTimerCaminhar";
+            chkTimerCaminhar.Size = new Size(126, 19);
+            chkTimerCaminhar.TabIndex = 2;
+            chkTimerCaminhar.Text = "Caminhar aleatório";
+            chkTimerCaminhar.UseVisualStyleBackColor = true;
+            chkTimerCaminhar.CheckedChanged += chkTimers_CheckedChanged;
+            //
             // chkTimerVoar
-            // 
+            //
             chkTimerVoar.AutoSize = true;
             chkTimerVoar.Checked = true;
             chkTimerVoar.CheckState = CheckState.Checked;
-            chkTimerVoar.Location = new Point(12, 62);
+            chkTimerVoar.Location = new Point(12, 87);
             chkTimerVoar.Name = "chkTimerVoar";
             chkTimerVoar.Size = new Size(98, 19);
-            chkTimerVoar.TabIndex = 2;
+            chkTimerVoar.TabIndex = 3;
             chkTimerVoar.Text = "Voar aleatório";
             chkTimerVoar.UseVisualStyleBackColor = true;
             chkTimerVoar.CheckedChanged += chkTimers_CheckedChanged;
@@ -108,7 +122,7 @@
             // chkComSom
             // 
             chkComSom.AutoSize = true;
-            chkComSom.Location = new Point(12, 87);
+            chkComSom.Location = new Point(12, 112);
             chkComSom.Name = "chkComSom";
             chkComSom.Size = new Size(78, 19);
             chkComSom.TabIndex = 4;
@@ -166,7 +180,7 @@
             // chkPermitirAgarrarSoltar
             // 
             chkPermitirAgarrarSoltar.AutoSize = true;
-            chkPermitirAgarrarSoltar.Location = new Point(12, 112);
+            chkPermitirAgarrarSoltar.Location = new Point(12, 137);
             chkPermitirAgarrarSoltar.Name = "chkPermitirAgarrarSoltar";
             chkPermitirAgarrarSoltar.Size = new Size(149, 19);
             chkPermitirAgarrarSoltar.TabIndex = 10;
@@ -177,7 +191,7 @@
             // chkApontarParaMouse
             // 
             chkApontarParaMouse.AutoSize = true;
-            chkApontarParaMouse.Location = new Point(12, 137);
+            chkApontarParaMouse.Location = new Point(12, 162);
             chkApontarParaMouse.Name = "chkApontarParaMouse";
             chkApontarParaMouse.Size = new Size(144, 19);
             chkApontarParaMouse.TabIndex = 11;
@@ -198,7 +212,7 @@
             // 
             cboComportamentoMouse.DropDownStyle = ComboBoxStyle.DropDownList;
             cboComportamentoMouse.FormattingEnabled = true;
-            cboComportamentoMouse.Location = new Point(12, 217);
+            cboComportamentoMouse.Location = new Point(12, 242);
             cboComportamentoMouse.Name = "cboComportamentoMouse";
             cboComportamentoMouse.Size = new Size(162, 23);
             cboComportamentoMouse.TabIndex = 13;
@@ -207,7 +221,7 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(12, 199);
+            label1.Location = new Point(12, 224);
             label1.Name = "label1";
             label1.Size = new Size(99, 15);
             label1.TabIndex = 14;
@@ -266,7 +280,7 @@
             // chkMostrarIndice
             // 
             chkMostrarIndice.AutoSize = true;
-            chkMostrarIndice.Location = new Point(12, 162);
+            chkMostrarIndice.Location = new Point(12, 187);
             chkMostrarIndice.Name = "chkMostrarIndice";
             chkMostrarIndice.Size = new Size(102, 19);
             chkMostrarIndice.TabIndex = 20;
@@ -308,7 +322,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(487, 275);
+            ClientSize = new Size(487, 300);
             Controls.Add(label2);
             Controls.Add(nudVelocidade);
             Controls.Add(btFormacaoQuadrada);
@@ -330,6 +344,7 @@
             Controls.Add(btMaisUmaMosca);
             Controls.Add(chkComSom);
             Controls.Add(chkTimerVoar);
+            Controls.Add(chkTimerCaminhar);
             Controls.Add(chkTimerRotacao);
             Controls.Add(chkTimerMoverPernas);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -346,6 +361,7 @@
 
         private CheckBox chkTimerMoverPernas;
         private CheckBox chkTimerRotacao;
+        private CheckBox chkTimerCaminhar;
         private CheckBox chkTimerVoar;
         private CheckBox chkComSom;
         private Button btMaisUmaMosca;

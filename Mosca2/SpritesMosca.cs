@@ -5,7 +5,10 @@ namespace Mosca2;
 
 internal static class SpritesMosca
 {
-    private static readonly string[] _nomes = ["Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5"];
+    private const bool UsarImagensNovas = false;
+    private static readonly string[] _nomesOriginais = ["Mosca1", "Mosca2", "Mosca3", "Mosca4", "Mosca5"];
+    private static readonly string[] _nomesNovos = ["Mosca6", "Mosca7", "Mosca8", "Mosca9", "Mosca10", "Mosca11", "Mosca12", "Mosca13"];
+    private static readonly string[] _nomes = UsarImagensNovas ? [.. _nomesOriginais, .. _nomesNovos] : _nomesOriginais;
     private static readonly Dictionary<int, Conjunto> _cache = [];
     private static readonly object _lock = new();
 

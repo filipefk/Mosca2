@@ -60,7 +60,7 @@ CheckBoxes do painel → métodos da mosca: "Mover pernas" → `AtivarTimerMover
 - Todas as constantes de ajuste (tempos, pesos, velocidades, raios) ficam no topo da classe.
 
 ### RenderizadorMosca / SpritesMosca
-`SpritesMosca` reduz `Mosca1–5.png` uma vez por tamanho e gera a versão com asas atenuadas e a sombra. `RenderizadorMosca` desenha sombra (afastada conforme a altura), corpo rotacionado (ângulo `float`, escala e `EscalaComprimento`), borrão procedural das asas em voo e o índice.
+`SpritesMosca` reduz `Mosca1–5.png` (as `Mosca6–13.png` estão desativadas pela constante `UsarImagensNovas` até terem brilho/cor ajustados) uma vez por tamanho e gera a versão com asas atenuadas e a sombra. `RenderizadorMosca` desenha sombra (afastada conforme a altura), corpo rotacionado (ângulo `float`, escala e `EscalaComprimento`), borrão procedural das asas em voo e o índice.
 
 ### ZumbidoMosca (`ZumbidoMosca.cs`)
 `ISampleProvider` que decodifica o MP3 uma vez (mono, sem silêncios nas pontas) e toca em loop com tom por mosca, taxa pela velocidade, pan pela posição X na tela virtual e fade-in/out. Retorna 0 amostras quando silencioso para o `WaveOutEvent` parar sozinho.
@@ -73,7 +73,7 @@ Hook de baixo nível (`WH_MOUSE_LL`) via P/Invoke; o callback roda na thread de 
 
 ## Recursos Embarcados
 
-Sprites das moscas (`Mosca1.png`–`Mosca5.png`), imagens de comida (`Lixo.png`, `Merda.png`) e o MP3 de zumbido ficam em `Mosca2/Resources/` e são compilados como recursos no executável. `LixoSombra.png` e `MerdaSombra.png` continuam nos recursos, mas não são mais usadas.
+Sprites das moscas (`Mosca1.png`–`Mosca13.png`, todas 450×450 com a cabeça na mesma posição; 6–13 desativadas), imagens de comida (`Lixo.png`, `Merda.png`) e o MP3 de zumbido ficam em `Mosca2/Resources/` e são compilados como recursos no executável. `LixoSombra.png` e `MerdaSombra.png` continuam nos recursos, mas não são mais usadas.
 
 ## Instruções do Projeto
 
