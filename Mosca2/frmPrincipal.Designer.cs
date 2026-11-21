@@ -62,6 +62,7 @@
             btDarComida = new Button();
             chkMostrarIndice = new CheckBox();
             btFormacaoQuadrada = new Button();
+            btRoubarMouse = new Button();
             nudVelocidade = new NumericUpDown();
             label2 = new Label();
             ((System.ComponentModel.ISupportInitialize)nudVelocidade).BeginInit();
@@ -92,22 +93,22 @@
             chkTimerRotacao.Text = "Rotação aleatório";
             chkTimerRotacao.UseVisualStyleBackColor = true;
             chkTimerRotacao.CheckedChanged += chkTimers_CheckedChanged;
-            //
+            // 
             // chkTimerCaminhar
-            //
+            // 
             chkTimerCaminhar.AutoSize = true;
             chkTimerCaminhar.Checked = true;
             chkTimerCaminhar.CheckState = CheckState.Checked;
             chkTimerCaminhar.Location = new Point(12, 62);
             chkTimerCaminhar.Name = "chkTimerCaminhar";
-            chkTimerCaminhar.Size = new Size(126, 19);
+            chkTimerCaminhar.Size = new Size(127, 19);
             chkTimerCaminhar.TabIndex = 2;
             chkTimerCaminhar.Text = "Caminhar aleatório";
             chkTimerCaminhar.UseVisualStyleBackColor = true;
             chkTimerCaminhar.CheckedChanged += chkTimers_CheckedChanged;
-            //
+            // 
             // chkTimerVoar
-            //
+            // 
             chkTimerVoar.AutoSize = true;
             chkTimerVoar.Checked = true;
             chkTimerVoar.CheckState = CheckState.Checked;
@@ -298,6 +299,16 @@
             btFormacaoQuadrada.UseVisualStyleBackColor = true;
             btFormacaoQuadrada.Click += btFormacaoQuadrada_Click;
             // 
+            // btRoubarMouse
+            // 
+            btRoubarMouse.Location = new Point(206, 265);
+            btRoubarMouse.Name = "btRoubarMouse";
+            btRoubarMouse.Size = new Size(129, 26);
+            btRoubarMouse.TabIndex = 24;
+            btRoubarMouse.Text = "Roubar o mouse";
+            btRoubarMouse.UseVisualStyleBackColor = true;
+            btRoubarMouse.Click += btRoubarMouse_Click;
+            // 
             // nudVelocidade
             // 
             nudVelocidade.Increment = new decimal(new int[] { 30, 0, 0, 0 });
@@ -322,7 +333,8 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(487, 300);
+            ClientSize = new Size(487, 303);
+            Controls.Add(btRoubarMouse);
             Controls.Add(label2);
             Controls.Add(nudVelocidade);
             Controls.Add(btFormacaoQuadrada);
@@ -347,9 +359,10 @@
             Controls.Add(chkTimerCaminhar);
             Controls.Add(chkTimerRotacao);
             Controls.Add(chkTimerMoverPernas);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "frmPrincipal";
-            ShowInTaskbar = false;
             Text = "Controle remoto";
             Load += frmPrincipal_Load;
             ((System.ComponentModel.ISupportInitialize)nudVelocidade).EndInit();
@@ -381,6 +394,7 @@
         private Button btDarComida;
         private CheckBox chkMostrarIndice;
         private Button btFormacaoQuadrada;
+        private Button btRoubarMouse;
         private NumericUpDown nudVelocidade;
         private Label label2;
     }

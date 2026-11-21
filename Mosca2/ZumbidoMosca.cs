@@ -69,7 +69,10 @@ internal sealed class ZumbidoMosca : ISampleProvider
     public int Read(float[] buffer, int offset, int count)
     {
         if (!_tocando && _volumeAtual <= 0f)
-            return 0;
+        {
+            Array.Clear(buffer, offset, count);
+            return count;
+        }
 
         int quadros = count / 2;
         int total = _amostras.Length;

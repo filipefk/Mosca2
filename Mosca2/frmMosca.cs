@@ -1,5 +1,4 @@
-﻿using NAudio.Wave;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Numerics;
 
 namespace Mosca2;
@@ -66,13 +65,37 @@ public partial class frmMosca : JanelaCamada
     private const double DistanciaFugaMinPx = 150;
     private const double DistanciaFugaMaxPx = 450;
     private const double ChanceFugaLonge = 0.2;
+    private const double FracaoDistanciaRoubo = 0.5;
+    private const int TentativasDestinoRoubo = 30;
+    private const double VelocidadeCoreografiaPxS = 1600;
+    private const double PeriodoRodaGiganteS = 3.0;
+    private const int VoltasRodaGigante = 2;
+    private const double RaioRodaGiganteMinPx = 180;
+    private const double TempoAproximacaoRodaS = 2.0;
+    private const double DancaFimFormacaoS = 2.5;
+    private const double DancaFimViradaS = 2.9;
+    private const double DancaFimOlaS = 4.8;
+    private const double DancaFimRequebradoS = 7.2;
+    private const double DancaFimPiaoS = 8.4;
+    private const double DancaFimExplosaoS = 9.4;
+    private const double DancaFimReuniaoS = 10.2;
+    private const double DancaFimOitoS = 13.7;
+    private const double DancaFimPoseS = 14.1;
+    private const double DancaFimLimparS = 15.3;
+    private const double DancaBatidaS = 0.4;
+    private const double DancaAtrasoOlaMaxS = 0.08;
+    private const double DancaDuracaoPuloS = 0.35;
+    private const float DancaAlturaPulo = 0.7f;
+    private const double DancaGingadoGraus = 30;
+    private const double DancaVoltasPiao = 2;
+    private const double DancaPeriodoOitoS = 3.5;
+    private const double DancaIntervaloLimparS = 0.12;
     private Point _ultimoCursor;
     private double _ultimoCursorEm = -1;
     private Vector2 _velocidadeCursor = Vector2.Zero;
     private Point _janela;
     private Point _destinoVoar;
     private bool _emVoo = false;
-    private WaveOutEvent? _waveOut;
     private ZumbidoMosca? _zumbido;
     private frmComida? _comidaAtual;
     private float _volumeBase = 1f;
@@ -121,9 +144,7 @@ public partial class frmMosca : JanelaCamada
         this.MouseUp += Mosca_MouseUp;
 
         _zumbido = new ZumbidoMosca(0.95f + (float)_random.NextDouble() * 0.1f);
-        _waveOut = new WaveOutEvent { DesiredLatency = 120 };
-        _waveOut.Init(_zumbido);
-        _waveOut.PlaybackStopped += WaveOut_PlaybackStopped;
+        MixerZumbido.Adicionar(_zumbido);
 
         this.StartPosition = FormStartPosition.Manual;
         _janela = ForaDeTodasTelasAleatorio();
@@ -152,7 +173,7 @@ public partial class frmMosca : JanelaCamada
 
     private Point Origem => new Point(_janela.X + _margem, _janela.Y + _margem);
 
-    private Point CursorRelativo => new Point((int)Math.Round(-23 * _escala), (int)Math.Round(13 * _escala));
+    private Point CursorRelativo => new Point(_tamanho / 2, _tamanho / 2);
 
     protected override void OnHandleCreated(EventArgs e)
     {
@@ -390,7 +411,30 @@ public partial class frmMosca : JanelaCamada
         await Task.Delay(esperarMilissegundos);
         var destinoMouse = OrigemParaCursorEm(Cursor.Position);
         await VoarPara(destinoMouse, 150);
-        await VoarPara(DestinoVoarAleatorio(), 80, true);
+        await VoarPara(DestinoLongeDe(Origem), 80, true);
+    }
+
+    private Point DestinoLongeDe(Point ponto)
+    {
+        var tela = Screen.FromPoint(ponto).WorkingArea;
+        double distanciaMin = Math.Sqrt((double)tela.Width * tela.Width + (double)tela.Height * tela.Height) * FracaoDistanciaRoubo;
+        Point melhor = ponto;
+        double melhorDistancia = -1;
+        for (int i = 0; i < TentativasDestinoRoubo; i++)
+        {
+            var candidato = DestinoVoarAleatorio();
+            double dx = candidato.X - ponto.X;
+            double dy = candidato.Y - ponto.Y;
+            double distancia = Math.Sqrt(dx * dx + dy * dy);
+            if (distancia >= distanciaMin)
+                return candidato;
+            if (distancia > melhorDistancia)
+            {
+                melhor = candidato;
+                melhorDistancia = distancia;
+            }
+        }
+        return melhor;
     }
 
     private Point DestinoVoarAleatorio()
@@ -742,19 +786,21 @@ public partial class frmMosca : JanelaCamada
             _ = Fugir();
     }
 
+    private async Task IniciarZumbido(bool fuga)
+    {
+        if (!ComSom || _zumbido == null)
+            return;
+        float[] volumes = { 1.0f, 0.8f, 0.5f, 0.3f, 0.1f };
+        _volumeBase = volumes[_random.Next(volumes.Length)];
+        AtualizarSom(0f);
+        _zumbido.Iniciar();
+        if (!fuga)
+            await Task.Delay(100);
+    }
+
     private async Task VoarComFisica(uint velocidade = 0, bool levarMouse = false, bool fuga = false)
     {
-        if (ComSom && _waveOut != null && _zumbido != null)
-        {
-            float[] volumes = { 1.0f, 0.8f, 0.5f, 0.3f, 0.1f };
-            _volumeBase = volumes[_random.Next(volumes.Length)];
-            AtualizarSom(0f);
-            _zumbido.Iniciar();
-            if (_waveOut.PlaybackState != PlaybackState.Playing)
-                _waveOut.Play();
-            if (!fuga)
-                await Task.Delay(100);
-        }
+        await IniciarZumbido(fuga);
         velocidade = velocidade == 0 ? (uint)_random.Next(80, 201) : velocidade;
 
         await Decolar(fuga);
@@ -860,12 +906,6 @@ public partial class frmMosca : JanelaCamada
         var telaVirtual = SystemInformation.VirtualScreen;
         if (telaVirtual.Width > 0)
             _zumbido.Pan = 2f * (CentroMosca.X - telaVirtual.Left) / telaVirtual.Width - 1f;
-    }
-
-    private void WaveOut_PlaybackStopped(object? sender, StoppedEventArgs e)
-    {
-        if (_zumbido != null && _zumbido.Tocando && _waveOut != null && !IsDisposed)
-            _waveOut.Play();
     }
 
     private static float AproximarAngulo(float atual, float alvo, float passoMax)
@@ -1007,77 +1047,240 @@ public partial class frmMosca : JanelaCamada
         SairDaComida();
 
         // Para o áudio
-        _zumbido?.Parar();
-        _zumbido = null;
-        if (_waveOut != null)
+        if (_zumbido != null)
         {
-            _waveOut.PlaybackStopped -= WaveOut_PlaybackStopped;
-            _waveOut.Stop();
-            _waveOut.Dispose();
-            _waveOut = null;
+            _zumbido.Parar();
+            MixerZumbido.Remover(_zumbido);
+            _zumbido = null;
         }
 
         // Fecha o formulário
         this.Close();
     }
 
-    public async Task DancaLoca()
+    public static double Agora => _relogio.Elapsed.TotalSeconds;
+
+    public async Task DancaLoca(int total, double inicio)
+    {
+        if (Indice < 0 || _dragging || total <= 0)
+            return;
+
+        IniciarCoreografia();
+        try
+        {
+            int i = Indice % total;
+            bool par = i % 2 == 0;
+            int perna1 = _random.Next(SpritesMosca.Quantidade);
+            int perna2 = (perna1 + 1 + _random.Next(Math.Max(1, SpritesMosca.Quantidade - 1))) % SpritesMosca.Quantidade;
+
+            var area = AreaTelaPrincipal();
+            var c = CentroTelaPrincipal();
+            var centro = new Vector2(c.X, c.Y);
+            var centroFisico = new Point(area.Left + area.Width / 2, area.Top + area.Height / 2);
+
+            // 1. Formação: fileira(s) no centro da tela principal
+            double espaco = _tamanho * 1.4;
+            int porLinha = Math.Max(1, (int)((area.Width - 2 * _tamanho) / espaco));
+            int linhas = (total + porLinha - 1) / porLinha;
+            int linha = i / porLinha;
+            int coluna = i % porLinha;
+            int naLinha = Math.Min(porLinha, total - linha * porLinha);
+            var vaga = centro + new Vector2(
+                (float)((coluna - (naLinha - 1) / 2.0) * espaco),
+                (float)((linha - (linhas - 1) / 2.0) * espaco));
+
+            await IniciarZumbido(false);
+            await Decolar();
+            await VoarPorTrajetoria(_ => vaga, inicio + DancaFimFormacaoS - 0.1);
+            if (Abortado) return;
+            _zumbido?.Parar();
+            await Pousar();
+
+            // 2. Todas viradas para cima
+            await AnimarAte(inicio + DancaFimViradaS, (t, dt) =>
+                _anguloAtual = AproximarAngulo(_anguloAtual, 0, (float)(600 * dt)));
+            if (Abortado) return;
+
+            // 3. Ola: pulinhos em onda, ida e volta pela fila
+            double atraso = total > 1 ? Math.Min(DancaAtrasoOlaMaxS, 0.6 / (total - 1)) : 0;
+            double puloIda = inicio + DancaFimViradaS + i * atraso;
+            double puloVolta = inicio + DancaFimViradaS + 0.9 + (total - 1 - i) * atraso;
+            await AnimarAte(inicio + DancaFimOlaS, (t, dt) =>
+            {
+                double u = (t - puloIda) / DancaDuracaoPuloS;
+                if (u < 0 || u > 1)
+                    u = (t - puloVolta) / DancaDuracaoPuloS;
+                bool pulando = u >= 0 && u <= 1;
+                _altura = pulando ? DancaAlturaPulo * (float)Math.Sin(Math.PI * u) : 0f;
+                _indiceSprite = pulando && u > 0.5 ? perna2 : perna1;
+            });
+            _altura = 0f;
+            if (Abortado) return;
+
+            // 4. Requebrado: pares e ímpares gingam em oposição, pernas no ritmo
+            double inicioRequebrado = inicio + DancaFimOlaS;
+            await AnimarAte(inicio + DancaFimRequebradoS, (t, dt) =>
+            {
+                double batidas = (t - inicioRequebrado) / DancaBatidaS;
+                double onda = Math.Sin(Math.PI * batidas);
+                _anguloAtual = Normalizar((float)((par ? 1 : -1) * DancaGingadoGraus * onda));
+                _indiceSprite = (int)Math.Floor(batidas) % 2 == 0 ? perna1 : perna2;
+                _escalaComprimento = (float)(1 - 0.03 * Math.Abs(onda));
+            });
+            _escalaComprimento = 1f;
+            if (Abortado) return;
+
+            // 5. Pião: duas voltas no lugar, sentidos alternados
+            double inicioPiao = inicio + DancaFimRequebradoS;
+            double duracaoPiao = DancaFimPiaoS - DancaFimRequebradoS;
+            await AnimarAte(inicio + DancaFimPiaoS, (t, dt) =>
+            {
+                double u = Math.Clamp((t - inicioPiao) / duracaoPiao, 0, 1);
+                _anguloAtual = Normalizar((float)((par ? 1 : -1) * 360 * DancaVoltasPiao * Suavizar(u)));
+                _indiceSprite = (int)Math.Floor((t - inicioPiao) / 0.1) % 2 == 0 ? perna1 : perna2;
+            });
+            if (Abortado) return;
+
+            // 6. Explosão em estrela, reunião e voo em oito
+            double faseEstrela = 2 * Math.PI * i / total - Math.PI / 2;
+            double raioEstrela = Math.Max(_tamanho, Math.Min(area.Width, area.Height) / 2.0 - _tamanho * 1.5);
+            var estrela = centro + Polar(faseEstrela, raioEstrela);
+
+            double a = Math.Max(_tamanho, Math.Min(area.Width / 2.0 - _tamanho * 1.5, (area.Height / 2.0 - _tamanho * 1.5) / 0.36));
+            double faseOito = 2 * Math.PI * i / total;
+            double tExplosao = inicio + DancaFimPiaoS;
+            double tReuniao = inicio + DancaFimExplosaoS;
+            double tOito = inicio + DancaFimReuniaoS;
+            Vector2 Oito(double t)
+            {
+                double th = faseOito + 2 * Math.PI * (t - tOito) / DancaPeriodoOitoS;
+                double s = Math.Sin(th), co = Math.Cos(th), d = 1 + s * s;
+                return centro + new Vector2((float)(a * co / d), (float)(a * s * co / d));
+            }
+            var inicioOito = Oito(tOito);
+
+            await IniciarZumbido(true);
+            await Decolar(true);
+            await VoarPorTrajetoria(t =>
+            {
+                if (t < tReuniao)
+                    return Vector2.Lerp(vaga, estrela, (float)Suavizar((t - tExplosao) / (tReuniao - tExplosao)));
+                if (t < tOito)
+                    return Vector2.Lerp(estrela, inicioOito, (float)Suavizar((t - tReuniao) / (tOito - tReuniao)));
+                return Oito(t);
+            }, inicio + DancaFimOitoS);
+            if (Abortado) return;
+            _zumbido?.Parar();
+            await Pousar();
+
+            // 7. Pose final virada para o centro e limpeza de patas em coro
+            float anguloCentro = AnguloPara(centroFisico);
+            await AnimarAte(inicio + DancaFimPoseS, (t, dt) =>
+                _anguloAtual = AproximarAngulo(_anguloAtual, anguloCentro, (float)(900 * dt)));
+            if (Abortado) return;
+
+            double inicioLimpar = inicio + DancaFimPoseS;
+            await AnimarAte(inicio + DancaFimLimparS, (t, dt) =>
+            {
+                double passos = (t - inicioLimpar) / DancaIntervaloLimparS;
+                _indiceSprite = (int)Math.Floor(passos) % 2 == 0 ? perna1 : perna2;
+                _escalaComprimento = (float)(0.985 + 0.015 * Math.Sin(2 * Math.PI * 2.5 * (t - inicioLimpar)));
+            });
+        }
+        finally
+        {
+            await FinalizarCoreografia();
+        }
+    }
+
+    private bool Abortado => IsDisposed || _dragging;
+
+    private void IniciarCoreografia()
     {
         AtivarTimers(false);
+        _emVoo = true;
+        _geracao++;
+        SairDaComida();
+        _escalaComprimento = 1f;
+        _tremor = Point.Empty;
+    }
 
-        AplicarAngulo(35);
-        await Task.Delay(200);
-
-        await PatinhasBoomerang(10);
-
-        await Rodopio(5, true);
-
-        // 5 - Mover um tanto para a esquerda
-        var origem = Origem;
-        PosicionarOrigem(new Point(origem.X - 100, origem.Y));
-        await Task.Delay(150);
-
-        AplicarAngulo(215);
-
-        await PatinhasBoomerang(10);
-
-        await Rodopio(5, false);
-
+    private async Task FinalizarCoreografia()
+    {
+        if (IsDisposed)
+            return;
+        _zumbido?.Parar();
+        _escalaComprimento = 1f;
+        if (_altura > 0f)
+            await Pousar();
+        ProximoIntervaloVoar();
         AtivarTimers(true);
     }
 
-    public async Task Rodopio(int numeroVoltas, bool sentidoHorario)
+    private async Task AnimarAte(double fim, Action<double, double> quadro)
     {
-        int passo = 120;
-        int direcao = sentidoHorario ? 1 : -1;
-
-        for (int i = 0; i < numeroVoltas * 3; i++)
+        double anterior = Agora;
+        while (!Abortado)
         {
-            int novoAngulo = ((int)Math.Round(_anguloAtual) + direcao * passo + 360) % 360;
-            await RotacionarSuaveAte(novoAngulo);
-            Application.DoEvents();
+            double agora = Agora;
+            if (agora >= fim)
+                break;
+            quadro(agora, Math.Clamp(agora - anterior, 0.001, 0.05));
+            anterior = agora;
+            Renderizar();
+            await Task.Delay(QuadroMs);
         }
     }
 
-    public async Task PatinhasBoomerang(int quantasVezes)
+    private async Task VoarPorTrajetoria(Func<double, Vector2> alvoEm, double fim)
     {
-        int idx1 = _random.Next(SpritesMosca.Quantidade);
-        int idx2;
-        do
+        double velMax = VelocidadeCoreografiaPxS * _escala;
+        var inicio = Origem;
+        var pos = new Vector2(inicio.X, inicio.Y);
+        double anterior = Agora;
+
+        while (!Abortado)
         {
-            idx2 = _random.Next(SpritesMosca.Quantidade);
-        } while (idx2 == idx1);
-        for (int i = 0; i < quantasVezes; i++)
-        {
-            foreach (var idx in new[] { idx1, idx2 })
+            double agora = Agora;
+            if (agora >= fim)
+                break;
+            double dt = Math.Clamp(agora - anterior, 0.001, 0.05);
+            anterior = agora;
+
+            var paraAlvo = alvoEm(agora) - pos;
+            float dist = paraAlvo.Length();
+            float passoMax = (float)(velMax * dt);
+            var deslocamento = dist <= passoMax ? paraAlvo : paraAlvo / dist * passoMax;
+            pos += deslocamento;
+
+            float velocidade = deslocamento.Length() / (float)dt;
+            if (velocidade > 1)
             {
-                _indiceSprite = idx;
-                Renderizar();
-                Application.DoEvents();
-                await Task.Delay(150);
+                float anguloVoo = (float)(Math.Atan2(deslocamento.Y, deslocamento.X) * 180 / Math.PI + 90);
+                _anguloAtual = AproximarAngulo(_anguloAtual, anguloVoo, (float)(TaxaGiroGrausS * dt));
             }
+
+            PosicionarOrigem(new Point((int)Math.Round(pos.X), (int)Math.Round(pos.Y)));
+            AtualizarSom((float)Math.Clamp(velocidade / velMax, 0, 1));
+
+            int gasto = (int)((Agora - agora) * 1000);
+            await Task.Delay(Math.Max(1, QuadroMs - gasto));
         }
     }
+
+    private static Vector2 Polar(double angulo, double raio) =>
+        new((float)(Math.Cos(angulo) * raio), (float)(Math.Sin(angulo) * raio));
+
+    private static double Suavizar(double u)
+    {
+        u = Math.Clamp(u, 0, 1);
+        return u * u * (3 - 2 * u);
+    }
+
+    private static float Normalizar(float angulo) => ((angulo % 360) + 360) % 360;
+
+    private static Rectangle AreaTelaPrincipal() =>
+        Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
 
     public async Task FilaIndiana()
     {
@@ -1115,21 +1318,31 @@ public partial class frmMosca : JanelaCamada
         AtivarTimers(true);
     }
 
-    public async Task RodaGigante()
+    public async Task RodaGigante(int total)
     {
-        AtivarTimers(false);
-        for (int i = 0; i < 4; i++)
+        if (Indice < 0 || _dragging || total <= 0)
+            return;
+
+        IniciarCoreografia();
+        try
         {
-            await VoarPara(BordaMaisProxima(Direcao.Cima), 50);
-            Application.DoEvents();
-            await VoarPara(BordaMaisProxima(Direcao.Direita), 50);
-            Application.DoEvents();
-            await VoarPara(BordaMaisProxima(Direcao.Baixo), 50);
-            Application.DoEvents();
-            await VoarPara(BordaMaisProxima(Direcao.Esquerda), 50);
-            Application.DoEvents();
+            var area = AreaTelaPrincipal();
+            var c = CentroTelaPrincipal();
+            var centro = new Vector2(c.X, c.Y);
+            double raio = Math.Max(RaioRodaGiganteMinPx * _escala, total * _tamanho * 1.6 / (2 * Math.PI));
+            raio = Math.Min(raio, Math.Max(_tamanho, Math.Min(area.Width, area.Height) / 2.0 - _tamanho));
+            double fase = 2 * Math.PI * (Indice % total) / total;
+
+            await IniciarZumbido(false);
+            await Decolar();
+            await VoarPorTrajetoria(
+                t => centro + Polar(fase + 2 * Math.PI * t / PeriodoRodaGiganteS, raio),
+                Agora + TempoAproximacaoRodaS + VoltasRodaGigante * PeriodoRodaGiganteS);
         }
-        AtivarTimers(true);
+        finally
+        {
+            await FinalizarCoreografia();
+        }
     }
 
     public void AtivarTimers(bool ativar)
@@ -1170,53 +1383,9 @@ public partial class frmMosca : JanelaCamada
             _geracao++;
     }
 
-    private Point BordaMaisProxima(Direcao? direcao = null)
-    {
-        // Descobre a tela onde o ponto está
-        Screen? screen = Screen.AllScreens.FirstOrDefault(s => s.WorkingArea.Contains(PosicaoAtual));
-        if (screen == null)
-        {
-            // Se não estiver em nenhuma tela, usa a principal
-            screen = Screen.PrimaryScreen;
-        }
-        var area = screen!.WorkingArea;
-
-        if (direcao != null)
-        {
-            switch (direcao.Value)
-            {
-                case Direcao.Cima:
-                    return new Point(PosicaoAtual.X, area.Top);
-                case Direcao.Baixo:
-                    return new Point(PosicaoAtual.X, area.Bottom - 30);
-                case Direcao.Esquerda:
-                    return new Point(area.Left, PosicaoAtual.Y);
-                case Direcao.Direita:
-                    return new Point(area.Right - 30, PosicaoAtual.Y);
-            }
-        }
-
-        // Calcula as distâncias até cada borda
-        int distTop = Math.Abs(PosicaoAtual.Y - area.Top);
-        int distBottom = Math.Abs(PosicaoAtual.Y - area.Bottom);
-        int distLeft = Math.Abs(PosicaoAtual.X - area.Left);
-        int distRight = Math.Abs(PosicaoAtual.X - area.Right);
-
-        int minDist = Math.Min(Math.Min(distTop, distBottom), Math.Min(distLeft, distRight));
-
-        if (minDist == distTop)
-            return new Point(PosicaoAtual.X, area.Top);
-        if (minDist == distBottom)
-            return new Point(PosicaoAtual.X, area.Bottom);
-        if (minDist == distLeft)
-            return new Point(area.Left, PosicaoAtual.Y);
-        // minDist == distRight
-        return new Point(area.Right, PosicaoAtual.Y);
-    }
-
     private Point CentroTelaPrincipal()
     {
-        var screen = Screen.PrimaryScreen?.WorkingArea ?? Screen.AllScreens[0].WorkingArea;
+        var screen = AreaTelaPrincipal();
         int centroX = screen.Left + screen.Width / 2 - _tamanho / 2;
         int centroY = screen.Top + screen.Height / 2 - _tamanho / 2;
         return new Point(centroX, centroY);

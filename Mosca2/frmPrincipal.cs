@@ -198,7 +198,8 @@ public partial class frmPrincipal : Form
 
     private async Task DancaLoca()
     {
-        var tasks = moscas.Select(mosca => mosca.DancaLoca());
+        var inicio = frmMosca.Agora;
+        var tasks = moscas.Select(mosca => mosca.DancaLoca(moscas.Count, inicio));
         await Task.WhenAll(tasks);
     }
 
@@ -217,7 +218,7 @@ public partial class frmPrincipal : Form
 
     private async Task RodaGigante()
     {
-        var tasks = moscas.Select(mosca => mosca.RodaGigante());
+        var tasks = moscas.Select(mosca => mosca.RodaGigante(moscas.Count));
         await Task.WhenAll(tasks);
     }
 
@@ -339,6 +340,16 @@ public partial class frmPrincipal : Form
     private async void btFormacaoQuadrada_Click(object sender, EventArgs e)
     {
         await FormacaoQuadrada();
+    }
+
+    private async void btRoubarMouse_Click(object sender, EventArgs e)
+    {
+        if (moscas.Count == 0)
+        {
+            return;
+        }
+        var mosca = moscas[Random.Shared.Next(moscas.Count)];
+        await mosca.RoubarMouse(1000);
     }
 
     private void nudVelocidade_ValueChanged(object sender, EventArgs e)
