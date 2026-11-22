@@ -8,7 +8,7 @@ Sabe aquela mosca chata que fica voando na sua tela e você não consegue matar?
 
 ![Moscas pousadas na comida](docs/moscas-na-comida.png)
 
-🎬 [Veja as moscas em ação (vídeo)](docs/Moscas.mp4)
+https://github.com/user-attachments/assets/b7a3fc39-8916-44f1-bb51-234589c581f0
 
 ## O que as moscas fazem
 
