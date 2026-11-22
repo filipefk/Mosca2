@@ -4,6 +4,12 @@ Sabe aquela mosca chata que fica voando na sua tela e você não consegue matar?
 
 **Mosca** é um aplicativo Windows que coloca moscas animadas na sua área de trabalho. Elas voam, zumbem, pousam, limpam as patinhas, fogem do seu cursor e, se você deixar, roubam o seu mouse.
 
+![Moscas espalhadas pela tela com o Controle Remoto aberto](docs/moscas-na-tela.png)
+
+![Moscas pousadas na comida](docs/moscas-na-comida.png)
+
+🎬 [Veja as moscas em ação (vídeo)](docs/Moscas.mp4)
+
 ## O que as moscas fazem
 
 - **Parecem de verdade**: bordas suaves, asas translúcidas que mostram o fundo da tela e sombra que se afasta quando a mosca levanta voo
